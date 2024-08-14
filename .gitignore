@@ -1,6 +1,2 @@
-wiki_backups
-db-data
-test
-node_modules
-*.env
-!sops.env
+**/node_modules
+in

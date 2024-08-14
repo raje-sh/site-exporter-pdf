@@ -1,7 +1,7 @@
 {
-  "name": "test",
+  "name": "wiki-exporter",
   "version": "1.0.0",
-  "description": "",
+  "description": "Export Wiki Pages To PDF",
   "main": "index.js",
   "scripts": {
     "start": "node --import=tsx --env-file .env index.ts"
