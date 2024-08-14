@@ -25,18 +25,5 @@ services:
     depends_on:
       - db
 
-  exporter:
-    build: ../
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ${PG_DB_NAME}
-      DB_USER: ${PG_USR_NAME}
-      DB_PASS: ${PG_USR_PWD}
-    volumes:
-      - ./output:/app/output
-    depends_on:
-      - wiki
-
 volumes:
   pg_vol:

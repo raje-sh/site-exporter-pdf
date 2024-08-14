@@ -1,5 +1,5 @@
 {
-  "name": "wiki-exporter",
+  "name": "wikijs-exporter-pdf",
   "version": "1.0.0",
   "description": "Export Wiki Pages To PDF",
   "main": "index.js",
@@ -11,10 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@puppeteer/replay": "^3.0.0",
+    "envalid": "^8.0.0",
+    "pdf-lib": "^1.17.1",
     "puppeteer": "^22.15.0",
-    "puppeteer-screen-recorder": "^3.0.3"
-  },
-  "devDependencies": {
     "tsx": "^4.16.5"
   }
 }

@@ -1,6 +1,12 @@
-FROM node:20-alpine@sha256:eb8101caae9ac02229bd64c024919fe3d4504ff7f329da79ca60a04db08cef52
+FROM ghcr.io/puppeteer/puppeteer:23.0.2
+RUN npx puppeteer browsers install chrome
+USER root
 WORKDIR /app
+RUN chown -Rh pptruser:pptruser /app
+
 COPY package*.json ./
-RUN npm install --production
+USER root
+RUN npm install
 COPY . .
-CMD ["node", "your-script.js"]
+# USER pptruser
+CMD ["npm", "run", "start"]
