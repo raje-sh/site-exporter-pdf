@@ -1,12 +1,15 @@
-FROM ghcr.io/puppeteer/puppeteer:23.0.2
-RUN npx puppeteer browsers install chrome
-USER root
-WORKDIR /app
-RUN chown -Rh pptruser:pptruser /app
+FROM ghcr.io/puppeteer/puppeteer:22.15.0@sha256:62af46dd09ea2dc6a79ec22e697a504dbf13ca8605006e7f7ca1cbd0cdea6a2f
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+RUN npm install -g npm
 
-COPY package*.json ./
 USER root
-RUN npm install
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci
 COPY . .
-# USER pptruser
+
+RUN chown -Rh pptruser:pptruser /usr/src/app
+RUN chmod -R 777 /usr/src/app
+USER pptruser
 CMD ["npm", "run", "start"]

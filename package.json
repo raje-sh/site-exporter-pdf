@@ -4,7 +4,8 @@
   "description": "Export Wiki Pages To PDF",
   "main": "index.js",
   "scripts": {
-    "start": "node --import=tsx --env-file .env index.ts"
+    "start:dev": "node --import=tsx --env-file .env index.ts",
+    "start": "NODE_ENV=production node --import=tsx index.ts"
   },
   "keywords": [],
   "author": "Rajesh Sundaram",

@@ -1,29 +1,52 @@
 import path from "path";
 import { env } from "./env";
-import puppeteer from "puppeteer";
+import puppeteer, { Browser, Page } from "puppeteer";
 import { setTimeout } from "node:timers/promises";
+
+const setPageCookies = (page: Page) => {
+  if (!env.SITE_COOKIES) return;
+
+  const cookies = env.SITE_COOKIES.split(";")
+    .map((it) => it.trim())
+    .filter((it) => it.length);
+  const cookieDomain = env.SITE_BASE_URL.split("://")[1].replace(/\/$/, "");
+  cookies.forEach((it) => {
+    const [key, value] = it.split("=");
+    page.setCookie({
+      name: key,
+      value: value,
+      domain: cookieDomain,
+    });
+  });
+};
+const initPage = async (browser: Browser) => {
+  const page = await browser.newPage();
+  setPageCookies(page);
+  page.setDefaultTimeout(env.PUPPETEER_PAGE_TIMEOUT);
+  await page.setViewport({
+    width: env.PUPPETEER_VP_WIDTH,
+    height: env.PUPPETEER_VP_HEIGHT,
+  });
+  return page;
+};
 
 export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
   const pdfFileChunks: Array<string> = [];
   const browser = await puppeteer.launch({
     headless: env.HEADLESS_MODE,
-    // args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    // executablePath: "/usr/bin/google-chrome",
+    executablePath: env.isProd
+      ? process.env.PUPPETEER_EXECUTABLE_PATH
+      : puppeteer.executablePath(),
+    ignoreDefaultArgs: ["--disable-extensions"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--no-zygote",
+      "--single-process",
+    ],
   });
-  const page = await browser.newPage();
-  if (env.JWT_TOKEN) {
-    page.setCookie({
-      name: "jwt",
-      value: env.JWT_TOKEN,
-      domain: env.SITE_BASE_URL.split("://")[1].replace(/\/$/, ""),
-    });
-  }
-  const timeout = 5000;
-  page.setDefaultTimeout(timeout);
-  await page.setViewport({
-    width: 1260,
-    height: 968,
-  });
+
+  const page = await initPage(browser);
   for (const link of links) {
     try {
       console.log(`process: "${link}"`);
