@@ -11,6 +11,8 @@ const getFullURI = (path: string) => `${env.SITE_BASE_URL}/${path}`;
 const createOutputDirectoryIfNotExists = () => {
   if (!fs.existsSync(env.OUTPUT_DIR)) {
     fs.mkdirSync(env.OUTPUT_DIR);
+  } else {
+    cleanOutputDirectoryExcept([]);
   }
 };
 
@@ -25,8 +27,6 @@ const createOutputDirectoryIfNotExists = () => {
       path.join(env.OUTPUT_DIR, resultFileName)
     );
     cleanOutputDirectoryExcept([resultFileName]);
-  } else {
-    cleanOutputDirectoryExcept(result.chunks);
   }
   console.log("Export Done");
 })().catch((err) => {

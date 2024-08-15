@@ -1,7 +1,6 @@
 import { bool, cleanEnv, num, str } from "envalid";
 import path from "path";
 
-// TODO: add validators
 export const env = cleanEnv(process.env, {
   SITE_COOKIES: str({
     desc: "WikiJS Cookies",
@@ -17,10 +16,10 @@ export const env = cleanEnv(process.env, {
     desc: "Comma Sperated page relative Paths",
     example: "en/page-1,ja/page-1",
   }),
-  HEADLESS_MODE: bool({ desc: "Chrome Mode", default: true }),
+  HEADLESS_MODE: bool({ default: true }),
   OUTPUT_DIR: str({
     default: path.resolve(__dirname, "../out"),
-    desc: "Absolute Path of the Export Directory",
+    desc: "Absolute Path of the Output Directory",
   }),
   WIKIJS_HIDE_SIDEBAR: bool({ default: true }),
   WIKIJS_PAGE_LOAD_TIME: num({ default: 1 * 1000 }),
