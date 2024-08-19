@@ -5,6 +5,7 @@ docker compose up -d
 docker build -t wikijs-pdf-exporter:latest .
 docker run -it --env-file ./.env -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" wikijs-pdf-exporter:latest;
 
+
 act -W .github/workflows/publish.yml -e .act/publish.json
 act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .act/publish.env -j publish;
 
@@ -15,14 +16,10 @@ docker run -it -e SITE_BASE_URL=http://localhost:3000 -e PAGE_LINKS=$CS_LINKS -e
 
 ## TODO
 
-- replace .env with yaml config
 - add devcontainer & tasksfile
-- use private image from dockerhub in local-wikijs
 - https://github.com/ousmanedev/wikitopdf
-- add env var validators (envalid)
 - add build/lint/test scripts
 - prep demo gif
-- take age key backup or use third party keystore
 - look for extracting sitemap using Wiki Api token
 
 # Reference Links

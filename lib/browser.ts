@@ -1,64 +1,81 @@
 import path from "path";
-import { env } from "./env";
-import puppeteer, { Browser, Page } from "puppeteer";
+import puppeteer, {
+  Browser,
+  FrameAddScriptTagOptions,
+  FrameAddStyleTagOptions,
+  Page,
+} from "puppeteer";
 import { setTimeout } from "node:timers/promises";
 import fs from "fs";
+import { AppConfig } from "./config";
+import { env } from "./env";
 
-const setPageCookies = (page: Page) => {
-  if (!env.SITE_COOKIES) return;
-
-  const cookies = env.SITE_COOKIES.split(";")
-    .map((it) => it.trim())
-    .filter((it) => it.length);
-  const cookieDomain = env.SITE_BASE_URL.split("://")[1].replace(/\/$/, "");
-  cookies.forEach((it) => {
-    const [key, value] = it.split("=");
+const setPageCookies = (page: Page, config: AppConfig) => {
+  const cookieDomain = config.site.base_url.split("://")[1].replace(/\/$/, "");
+  config.site.cookies.forEach((it) => {
     page.setCookie({
-      name: key,
-      value: value,
+      name: it.key,
+      value: it.value,
       domain: cookieDomain,
     });
   });
 };
-const initPage = async (browser: Browser) => {
+const initPage = async (browser: Browser, config: AppConfig) => {
   const page = await browser.newPage();
-  setPageCookies(page);
-  page.setDefaultTimeout(env.PUPPETEER_PAGE_TIMEOUT);
+  setPageCookies(page, config);
+  page.setDefaultTimeout(config.browser.page_timeout);
   await page.setViewport({
-    width: env.PUPPETEER_VP_WIDTH,
-    height: env.PUPPETEER_VP_HEIGHT,
+    width: config.browser.viewport.width,
+    height: config.browser.viewport.height,
   });
   return page;
 };
 
-const injectAsset = async (
+const injectAssets = async (
   page: Page,
   type: "script" | "style",
-  filepath: string
+  // TODO: filepath, url or string_content
+  files: string[]
 ) => {
-  if (!fs.existsSync(filepath)) {
-    console.error("injection error: file not found", filepath);
-    return;
-  }
-  const fileContent = fs.readFileSync(filepath, "utf-8");
-  switch (type) {
-    case "script":
-      await page.addScriptTag({
-        content: fileContent,
-      });
-      break;
-    case "style":
-      await page.addStyleTag({ content: fileContent });
-      break;
-    default:
-      console.warn("unsupported injection");
+  const urlRegex = /\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*\b/g;
+  // const unixPathRegex = /^(\/|\.\/|\.\.\/|~\/)?([^\/\0]+(\/)?)+$/;
+  const getTagOptions = (
+    asset: string,
+    tagOptions: FrameAddScriptTagOptions | FrameAddStyleTagOptions
+  ) => {
+    // TODO: Optimize
+    if (urlRegex.test(asset)) {
+      tagOptions = { ...tagOptions, url: asset };
+    } else if (fs.existsSync(asset)) {
+      const fileContent = fs.readFileSync(asset, "utf-8");
+      tagOptions = { ...tagOptions, content: fileContent };
+    } else {
+      // console.warn("injection error: file not found", asset);
+      tagOptions = { ...tagOptions, content: asset };
+    }
+    return tagOptions;
+  };
+  for (const asset of files) {
+    switch (type) {
+      case "script":
+        await page.addScriptTag(getTagOptions(asset, {}));
+        break;
+      case "style":
+        await page.addStyleTag(getTagOptions(asset, {}));
+        break;
+      default:
+        console.warn("unsupported injection");
+    }
   }
 };
 
-export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
+export const launchBrowserAndTakeSnapshot = async (
+  links: string[],
+  config: AppConfig
+) => {
   const pdfFileChunks: Array<string> = [];
   const browser = await puppeteer.launch({
-    headless: env.HEADLESS_MODE,
+    headless: config.browser.headless,
     executablePath: env.isProd
       ? process.env.PUPPETEER_EXECUTABLE_PATH
       : puppeteer.executablePath(),
@@ -72,28 +89,27 @@ export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
     ],
   });
 
-  const page = await initPage(browser);
+  const page = await initPage(browser, config);
   for (const link of links) {
     try {
       console.log(`process: "${link}"`);
       await page.goto(link, {
         waitUntil: "networkidle2",
-        timeout: env.PUPPETEER_PAGE_TIMEOUT,
       });
-      if (env.INJECT_JS_FILE_PATH) {
-        await injectAsset(page, "script", env.INJECT_JS_FILE_PATH);
+      if (config.browser.inject.js?.length) {
+        await injectAssets(page, "script", config.browser.inject.js);
       }
-      if (env.INJECT_CSS_FILE_PATH) {
-        await injectAsset(page, "style", env.INJECT_CSS_FILE_PATH);
+      if (config.browser.inject.css?.length) {
+        await injectAssets(page, "style", config.browser.inject.css);
       }
       const pageTitle = await page.evaluate(() =>
         document.title.substring(0, document.title.lastIndexOf("|")).trim()
       );
-      await setTimeout(env.WIKIJS_PAGE_LOAD_TIME);
+      await setTimeout(config.browser.inject.load_delay);
       const fileName = `${pageTitle}.pdf`;
       pdfFileChunks.push(fileName);
       await page.pdf({
-        path: path.join(env.OUTPUT_DIR, fileName),
+        path: path.join(config.output.dir, fileName),
         format: "A4",
       });
     } catch (e) {

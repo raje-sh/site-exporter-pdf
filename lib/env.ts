@@ -1,44 +1,18 @@
-import { bool, cleanEnv, num, str } from "envalid";
-import path from "path";
+import { cleanEnv, str } from "envalid";
 
 export const env = cleanEnv(process.env, {
   SITE_COOKIES: str({
-    desc: "WikiJS Cookies",
+    desc: "Site Cookies",
     example: "domain=jwt-token;cookie1=value1;",
     default: undefined,
   }),
-  SITE_BASE_URL: str({ desc: "WikiJS base URL", example: "http://localhost" }),
+  CONFIG_FILE_PATH: str({
+    desc: "yaml config file path",
+    default: "./config.yml",
+    example: "/usr/app/config.yml",
+  }),
   NODE_ENV: str({
     choices: ["development", "test", "production"],
     default: "production",
   }),
-  PAGE_LINKS: str({
-    desc: "Comma Sperated page relative Paths",
-    example: "en/page-1,ja/page-1",
-  }),
-  HEADLESS_MODE: bool({ default: true }),
-  OUTPUT_DIR: str({
-    default: path.resolve(__dirname, "../out"),
-    desc: "Absolute Path of the Output Directory",
-  }),
-  INJECT_JS_FILE_PATH: str({
-    default: undefined,
-    desc: "Inject into pages",
-  }),
-  INJECT_CSS_FILE_PATH: str({
-    default: undefined,
-    desc: "Inject into pages",
-  }),
-  WIKIJS_PAGE_LOAD_TIME: num({ default: 1 * 1000 }),
-  OUTPUT_PDF_TYPE: str({
-    choices: ["single", "separate"],
-    default: "single",
-  }),
-  OUTPUT_FILE_NAME: str({
-    default: "result",
-    desc: "output filename when output-type set to single",
-  }),
-  PUPPETEER_PAGE_TIMEOUT: num({ default: 30 * 1000 }),
-  PUPPETEER_VP_WIDTH: num({ default: 1260 }),
-  PUPPETEER_VP_HEIGHT: num({ default: 968 }),
 });

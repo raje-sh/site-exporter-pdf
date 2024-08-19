@@ -1,32 +1,33 @@
 import fs from "fs";
-import { env } from "./lib/env";
 import path from "path";
 import {
   mergePDFs,
   launchBrowserAndTakeSnapshot,
   cleanOutputDirectoryExcept,
+  parseConfig,
 } from "./lib";
 
-const getFullURI = (path: string) => `${env.SITE_BASE_URL}/${path}`;
+const config = parseConfig();
+const getFullURI = (path: string) => `${config.site.base_url}/${path}`;
 const createOutputDirectoryIfNotExists = () => {
-  if (!fs.existsSync(env.OUTPUT_DIR)) {
-    fs.mkdirSync(env.OUTPUT_DIR);
+  if (!fs.existsSync(config.output.dir)) {
+    fs.mkdirSync(config.output.dir);
   } else {
-    cleanOutputDirectoryExcept([]);
+    cleanOutputDirectoryExcept([], config.output.dir);
   }
 };
 
 (async () => {
   createOutputDirectoryIfNotExists();
-  const links = env.PAGE_LINKS.split(",").map(getFullURI);
-  const result = await launchBrowserAndTakeSnapshot(links);
-  if (env.OUTPUT_PDF_TYPE === "single") {
-    const resultFileName = env.OUTPUT_FILE_NAME.concat(".pdf");
+  const links = config.site.links.map(getFullURI);
+  const result = await launchBrowserAndTakeSnapshot(links, config);
+  if (config.output.type === "single") {
+    const resultFileName = config.output.filename.concat(".pdf");
     await mergePDFs(
-      result.chunks.map((it) => path.resolve(env.OUTPUT_DIR, it)),
-      path.join(env.OUTPUT_DIR, resultFileName)
+      result.chunks.map((it) => path.resolve(config.output.dir, it)),
+      path.join(config.output.dir, resultFileName)
     );
-    cleanOutputDirectoryExcept([resultFileName]);
+    cleanOutputDirectoryExcept([resultFileName], config.output.dir);
   }
   console.log("Export Done");
 })().catch((err) => {

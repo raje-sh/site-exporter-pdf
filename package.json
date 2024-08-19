@@ -4,7 +4,7 @@
   "description": "Export Wiki Pages To PDF",
   "main": "index.js",
   "scripts": {
-    "start:dev": "node --import=tsx --env-file .env index.ts",
+    "start:dev": "node --import=tsx index.ts",
     "start": "NODE_ENV=production node --import=tsx index.ts"
   },
   "keywords": [],
@@ -13,6 +13,8 @@
   "dependencies": {
     "@puppeteer/replay": "^3.0.0",
     "envalid": "^8.0.0",
+    "joi": "^17.13.3",
+    "js-yaml": "^4.1.0",
     "pdf-lib": "^1.17.1",
     "puppeteer": "^22.15.0",
     "tsx": "^4.16.5"
