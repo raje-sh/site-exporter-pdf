@@ -21,7 +21,7 @@ const createOutputDirectoryIfNotExists = () => {
   const links = env.PAGE_LINKS.split(",").map(getFullURI);
   const result = await launchBrowserAndTakeSnapshot(links);
   if (env.OUTPUT_PDF_TYPE === "single") {
-    const resultFileName = `result_${Date.now()}.pdf`;
+    const resultFileName = env.OUTPUT_FILE_NAME.concat(".pdf");
     await mergePDFs(
       result.chunks.map((it) => path.resolve(env.OUTPUT_DIR, it)),
       path.join(env.OUTPUT_DIR, resultFileName)

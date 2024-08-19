@@ -21,11 +21,22 @@ export const env = cleanEnv(process.env, {
     default: path.resolve(__dirname, "../out"),
     desc: "Absolute Path of the Output Directory",
   }),
-  WIKIJS_HIDE_SIDEBAR: bool({ default: true }),
+  INJECT_JS_FILE_PATH: str({
+    default: undefined,
+    desc: "Inject into pages",
+  }),
+  INJECT_CSS_FILE_PATH: str({
+    default: undefined,
+    desc: "Inject into pages",
+  }),
   WIKIJS_PAGE_LOAD_TIME: num({ default: 1 * 1000 }),
   OUTPUT_PDF_TYPE: str({
     choices: ["single", "separate"],
     default: "single",
+  }),
+  OUTPUT_FILE_NAME: str({
+    default: "result",
+    desc: "output filename when output-type set to single",
   }),
   PUPPETEER_PAGE_TIMEOUT: num({ default: 30 * 1000 }),
   PUPPETEER_VP_WIDTH: num({ default: 1260 }),

@@ -15,8 +15,7 @@ docker run -it -e SITE_BASE_URL=http://localhost:3000 -e PAGE_LINKS=$CS_LINKS -e
 
 ## TODO
 
-- add result file name if single pdf
-- allow injecting custom js script (usecase: replace link urls, view all tabs)
+- replace .env with yaml config
 - add devcontainer & tasksfile
 - use private image from dockerhub in local-wikijs
 - https://github.com/ousmanedev/wikitopdf

@@ -2,6 +2,7 @@ import path from "path";
 import { env } from "./env";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { setTimeout } from "node:timers/promises";
+import fs from "fs";
 
 const setPageCookies = (page: Page) => {
   if (!env.SITE_COOKIES) return;
@@ -30,6 +31,30 @@ const initPage = async (browser: Browser) => {
   return page;
 };
 
+const injectAsset = async (
+  page: Page,
+  type: "script" | "style",
+  filepath: string
+) => {
+  if (!fs.existsSync(filepath)) {
+    console.error("injection error: file not found", filepath);
+    return;
+  }
+  const fileContent = fs.readFileSync(filepath, "utf-8");
+  switch (type) {
+    case "script":
+      await page.addScriptTag({
+        content: fileContent,
+      });
+      break;
+    case "style":
+      await page.addStyleTag({ content: fileContent });
+      break;
+    default:
+      console.warn("unsupported injection");
+  }
+};
+
 export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
   const pdfFileChunks: Array<string> = [];
   const browser = await puppeteer.launch({
@@ -37,12 +62,13 @@ export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
     executablePath: env.isProd
       ? process.env.PUPPETEER_EXECUTABLE_PATH
       : puppeteer.executablePath(),
+    // slowMo: 500,
     ignoreDefaultArgs: ["--disable-extensions"],
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--no-zygote",
-      "--single-process",
+      // "--single-process",
     ],
   });
 
@@ -50,12 +76,15 @@ export const launchBrowserAndTakeSnapshot = async (links: string[]) => {
   for (const link of links) {
     try {
       console.log(`process: "${link}"`);
-      await page.goto(link, { waitUntil: "networkidle2" });
-      if (env.WIKIJS_HIDE_SIDEBAR) {
-        await page.addStyleTag({
-          content:
-            "nav.v-navigation-drawer{display: none;} main.v-main{padding: 0 !important;}",
-        });
+      await page.goto(link, {
+        waitUntil: "networkidle2",
+        timeout: env.PUPPETEER_PAGE_TIMEOUT,
+      });
+      if (env.INJECT_JS_FILE_PATH) {
+        await injectAsset(page, "script", env.INJECT_JS_FILE_PATH);
+      }
+      if (env.INJECT_CSS_FILE_PATH) {
+        await injectAsset(page, "style", env.INJECT_CSS_FILE_PATH);
       }
       const pageTitle = await page.evaluate(() =>
         document.title.substring(0, document.title.lastIndexOf("|")).trim()
