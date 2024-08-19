@@ -1,5 +1,6 @@
 site:
-  base_url: http://localhost:3000
+  # base_url: http://localhost:3000
+  base_url: http://host.docker.internal:3000
   links:
     - en/onboarding/installation-issues
     - en/aws/training/training-session-1
@@ -7,7 +8,7 @@ site:
     - key: jwt
       value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJyYWplc2guc3VuZGFyYW1AaGNsdGVjaC5jb20iLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsImF2IjpudWxsLCJ0eiI6IkFzaWEvVG9reW8iLCJsYyI6ImVuIiwiZGYiOiIiLCJhcCI6IiIsInBlcm1pc3Npb25zIjpbIm1hbmFnZTpzeXN0ZW0iXSwiZ3JvdXBzIjpbMV0sImlhdCI6MTcyNDAzNjk0MiwiZXhwIjoxNzI0MDM4NzQyLCJhdWQiOiJ1cm46d2lraS5qcyIsImlzcyI6InVybjp3aWtpLmpzIn0.bsNdrWcgRTPOr0uhrw9yN90hMSZIu35W0L_KNif8BZtrhWWDK11pix2Purje8mvFKeiA4iBK1vTCwo9-BJHKnIlv22rrBceS_vHcTnblENMcRk_50jfcPYKfrbDkdu0ndBab37WdPJhFV6LCEO_opFSZRigHqm7IlKEdTbXnAjsQJ8U9l87ijLRBjLrfPzwf7EXlxC6aubJzQm4Kvn7FL1sTwu0-88wm1UgPagkzg0Gtmo8bky4obsijXNziFoBQ5BG96NqhiMrbuhNxlyXgn8XUmLjzI1OJyxM26ChKUVxZNT6NIJMk5CRGIqBbpUo0PY6gItDHOJ3Xzm902VbdgQ
 browser:
-  headless: false
+  headless: true
   inject:
     css:
       - |

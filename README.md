@@ -1,13 +1,12 @@
 # Commands
 
 ```bash
-docker compose up -d
 docker build -t wikijs-pdf-exporter:latest .
 docker run -it --env-file ./.env -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" wikijs-pdf-exporter:latest;
 
 
-act -W .github/workflows/publish.yml -e .act/publish.json
-act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .act/publish.env -j publish;
+act -W .github/workflows/publish.yml -e .github/act.publish.env
+act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .github/act.publish.env -j publish;
 
 
 
@@ -16,7 +15,7 @@ docker run -it -e SITE_BASE_URL=http://localhost:3000 -e PAGE_LINKS=$CS_LINKS -e
 
 ## TODO
 
-- add devcontainer & tasksfile
+- add tasksfile
 - https://github.com/ousmanedev/wikitopdf
 - add build/lint/test scripts
 - prep demo gif

@@ -1,0 +1,39 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker
+{
+	"name": "Docker outside of Docker",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers-contrib/features/tsx:1": {},
+		"ghcr.io/dhoeric/features/act:1": {},
+		"ghcr.io/audacioustux/devcontainers/taskfile:1": {},
+		"ghcr.io/kreemer/features/chrometesting:1": {},
+		"ghcr.io/devcontainers-contrib/features/age:1": {},
+		"ghcr.io/devcontainers-contrib/features/age-keygen:1": {},
+		"ghcr.io/devcontainers-contrib/features/sops:1": {}
+	},
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"github.vscode-github-actions"
+			]
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Configure tool-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+	"postCreateCommand": "bash /workspaces/wikijs-pdf-export/.devcontainer/create.sh",
+	"postStartCommand": "bash /workspaces/wikijs-pdf-export/.devcontainer/start.sh"
+}
