@@ -2,6 +2,8 @@ import yaml from "js-yaml";
 import fs from "fs";
 import { env } from "./env";
 import Joi from "joi";
+
+type FileInjection = { file: string; url: string; content: string };
 export type AppConfig = {
   site: {
     base_url: string;
@@ -11,8 +13,8 @@ export type AppConfig = {
   browser: {
     headless: boolean;
     inject: {
-      css: Array<string>;
-      js: Array<string>;
+      css: Array<Partial<FileInjection>>;
+      js: Array<Partial<FileInjection>>;
       load_delay: number;
     };
     viewport: {
@@ -79,9 +81,24 @@ const configSchema = Joi.object({
     page_timeout: Joi.number().default(30 * 1000),
     inject: Joi.object({
       load_delay: Joi.number().default(1 * 1000),
-      // TODO: path, url, content_string
-      css: Joi.array().items(Joi.string()).default([]),
-      js: Joi.array().items(Joi.string()).default([]),
+      css: Joi.array()
+        .items(
+          Joi.object({
+            file: Joi.string(),
+            content: Joi.string(),
+            url: Joi.string(),
+          }).xor("file", "content", "url")
+        )
+        .default([]),
+      js: Joi.array()
+        .items(
+          Joi.object({
+            file: Joi.string(),
+            content: Joi.string(),
+            url: Joi.string(),
+          }).xor("file", "content", "url")
+        )
+        .default([]),
     }).default(),
   }).default(),
   output: Joi.object({

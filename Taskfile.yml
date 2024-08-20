@@ -1,0 +1,10 @@
+version: '3'
+
+tasks:
+  start:
+    cmds:
+      - docker run -it  --rm -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" $IMAGE_NAME
+    env:
+      SITE_BASE_URL: http://localhost:3000
+      SITE_COOKIES: jwt=$JWT_TOKEN
+      IMAGE_NAME: rasuhcl/wikijs-pdf-export:latest

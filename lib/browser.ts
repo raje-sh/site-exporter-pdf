@@ -34,24 +34,19 @@ const initPage = async (browser: Browser, config: AppConfig) => {
 const injectAssets = async (
   page: Page,
   type: "script" | "style",
-  // TODO: filepath, url or string_content
-  files: string[]
+  files: AppConfig["browser"]["inject"]["css"]
 ) => {
-  const urlRegex = /\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*\b/g;
-  // const unixPathRegex = /^(\/|\.\/|\.\.\/|~\/)?([^\/\0]+(\/)?)+$/;
   const getTagOptions = (
-    asset: string,
+    asset: AppConfig["browser"]["inject"]["css"][0],
     tagOptions: FrameAddScriptTagOptions | FrameAddStyleTagOptions
   ) => {
-    // TODO: Optimize
-    if (urlRegex.test(asset)) {
-      tagOptions = { ...tagOptions, url: asset };
-    } else if (fs.existsSync(asset)) {
-      const fileContent = fs.readFileSync(asset, "utf-8");
+    if (asset.url) {
+      tagOptions = { ...tagOptions, url: asset.url };
+    } else if (asset.file && fs.existsSync(asset.file)) {
+      const fileContent = fs.readFileSync(asset.file, "utf-8");
       tagOptions = { ...tagOptions, content: fileContent };
     } else {
-      // console.warn("injection error: file not found", asset);
-      tagOptions = { ...tagOptions, content: asset };
+      tagOptions = { ...tagOptions, content: asset.content };
     }
     return tagOptions;
   };
@@ -96,7 +91,7 @@ export const launchBrowserAndTakeSnapshot = async (
       await page.goto(link, {
         waitUntil: "networkidle2",
       });
-      if (config.browser.inject.js?.length) {
+      if (config.browser.inject.js.length) {
         await injectAssets(page, "script", config.browser.inject.js);
       }
       if (config.browser.inject.css?.length) {
