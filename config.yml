@@ -1,15 +1,14 @@
 site:
   base_url: ${WIKI_BASE_URL:-http://localhost:3000}
   links:
-    # - en/home
-    - /aws/training/app-fundamentals
+    - en/home
+    - aws/training/app-fundamentals
   cookies:
     - key: jwt
       value: ${WIKIJS_JWT}
 browser:
   headless: ${CHROMIUM_HEADLESS_MODE:-false}
   inject:
-    load_delay: 500
     css:
       - content: |
           nav.v-navigation-drawer,header.v-sheet,footer.v-footer{display: none;}

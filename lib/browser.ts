@@ -19,16 +19,7 @@ const setPageCookies = (page: Page, config: AppConfig) => {
     });
   });
 };
-const initPage = async (browser: Browser, config: AppConfig) => {
-  const page = await browser.newPage();
-  setPageCookies(page, config);
-  page.setDefaultTimeout(config.browser.page_timeout);
-  await page.setViewport({
-    width: config.browser.viewport.width,
-    height: config.browser.viewport.height,
-  });
-  return page;
-};
+const initPage = async (browser: Browser, config: AppConfig) => {};
 
 const injectAssets = async (
   page: Page,
@@ -75,11 +66,7 @@ const injectAssets = async (
   }
 };
 
-export const launchBrowserAndTakeSnapshot = async (
-  links: string[],
-  config: AppConfig
-) => {
-  const pdfFileChunks: Array<string> = [];
+const withBrowser = async (fn: Function, config: AppConfig) => {
   const browser = await puppeteer.launch({
     headless: config.browser.headless,
     executablePath: env.isProd
@@ -96,43 +83,86 @@ export const launchBrowserAndTakeSnapshot = async (
       // "--single-process",
     ],
   });
-
-  const page = await initPage(browser, config);
-  for (const link of links) {
-    try {
-      console.log(`process: "${link}"`);
-      await page.goto(link, {
-        waitUntil: "networkidle2",
-      });
-      await page.waitForSelector(".tabset-content .tabset-panel");
-      if (config.browser.inject.js.length) {
-        await injectAssets(page, "script", config.browser.inject.js);
-      }
-      if (config.browser.inject.css?.length) {
-        await injectAssets(page, "style", config.browser.inject.css);
-      }
-      const pageTitle = await page.evaluate(() =>
-        document.title.substring(0, document.title.lastIndexOf("|")).trim()
-      );
-
-      await page.waitForNavigation({ waitUntil: "networkidle0" });
-      await setTimeout(config.browser.inject.load_delay);
-      // await page.evaluate(() => {
-      //   debugger;
-      // });
-      const fileName = `${pageTitle}.pdf`;
-      pdfFileChunks.push(fileName);
-      await page.pdf({
-        path: path.join(config.output.dir, fileName),
-        format: "A4",
-      });
-    } catch (e) {
-      console.warn(`error: "${link}"`);
-      console.error(e);
-    }
+  try {
+    return await fn(browser);
+  } finally {
+    await browser.close();
   }
-  await browser.close();
-  return {
-    chunks: pdfFileChunks,
+};
+
+const withPage =
+  (browser: Browser, config: AppConfig) => async (fn: Function) => {
+    const page = await browser.newPage();
+    setPageCookies(page, config);
+    page.setDefaultTimeout(config.browser.page_timeout);
+    await page.setViewport({
+      width: config.browser.viewport.width,
+      height: config.browser.viewport.height,
+    });
+    try {
+      return await fn(page);
+    } finally {
+      await page.close();
+    }
   };
+
+const processLink = async (link: string, config: AppConfig, page: Page) => {
+  console.log(`process: "${link}"`);
+  await page.goto(link, {
+    waitUntil: "networkidle2",
+  });
+  if (config.browser.inject.js.length) {
+    await injectAssets(page, "script", config.browser.inject.js);
+  }
+  if (config.browser.inject.css?.length) {
+    await injectAssets(page, "style", config.browser.inject.css);
+  }
+  const pageTitle = await page.evaluate(() =>
+    document.title.substring(0, document.title.lastIndexOf("|")).trim()
+  );
+
+  await setTimeout(config.browser.inject.load_delay);
+  // await page.evaluate(() => {
+  //   debugger;
+  // });
+  const fileName = `${pageTitle}.pdf`;
+
+  await page.pdf({
+    path: path.join(config.output.dir, fileName),
+    format: "A4",
+    margin: {
+      top: 20,
+      bottom: 20,
+      left: 20,
+      right: 20,
+    },
+  });
+  return fileName;
+};
+
+export const launchBrowserAndTakeSnapshot = async (
+  links: string[],
+  config: AppConfig
+) => {
+  const pdfFileChunks: Array<string> = [];
+  return await withBrowser(async (browser: Browser) => {
+    for (const link of links) {
+      try {
+        const fileName = await withPage(
+          browser,
+          config
+        )(async (page: Page) => {
+          return await processLink(link, config, page);
+        });
+        pdfFileChunks.push(fileName);
+      } catch (e) {
+        console.warn(`error: "${link}"`);
+        console.error(e);
+      }
+    }
+
+    return {
+      chunks: pdfFileChunks,
+    };
+  }, config);
 };

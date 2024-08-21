@@ -1,17 +1,17 @@
 ## TODO
 
+- optimize execution speed https://advancedweb.hu/how-to-speed-up-puppeteer-scraping-with-parallelization/
+- alter commits history and commiter account
+- prep readme.md with usage instructions
 - prep demo gif
   start wikijs, create-pages, copy jwt, prep config yaml, export in terminal, open pdf
 - prep github actions
-- alter commits history and commiter account
+- add build/lint/test scripts
 - remove blank spaces in pdf file
-- apply margin to pdf
-- prep readme.md with usage instructions
 - look for extracting sitemap using Wiki Api token
 - https://github.com/ousmanedev/wikitopdf
-- add build/lint/test scripts
-- optimize execution speed https://advancedweb.hu/how-to-speed-up-puppeteer-scraping-with-parallelization/
 - two pages with same title?
+- problem with inline js content `${env-var-issue}`
 
 # Reference Links
 
