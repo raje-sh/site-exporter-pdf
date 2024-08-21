@@ -2,3 +2,4 @@
 .env
 out
 **/.DS_Store
+config.yml.tmp

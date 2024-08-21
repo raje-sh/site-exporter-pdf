@@ -1,10 +1,11 @@
 version: '3'
 
 tasks:
-  start:
+  export:
     cmds:
-      - docker run -it  --rm -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" $IMAGE_NAME
+      - docker run -it --env-file ./.env --rm -v ./config.yml:/usr/src/app/config.yml -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" $IMAGE_NAME
     env:
-      SITE_BASE_URL: http://localhost:3000
-      SITE_COOKIES: jwt=$JWT_TOKEN
       IMAGE_NAME: rasuhcl/wikijs-pdf-export:latest
+  act:publish:
+    cmds:
+      - act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .github/act.publish.env -j publish;

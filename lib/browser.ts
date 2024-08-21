@@ -7,8 +7,7 @@ import puppeteer, {
 } from "puppeteer";
 import { setTimeout } from "node:timers/promises";
 import fs from "fs";
-import { AppConfig } from "./config";
-import { env } from "./env";
+import { AppConfig, env } from "./config";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
   const cookieDomain = config.site.base_url.split("://")[1].replace(/\/$/, "");
@@ -34,10 +33,14 @@ const initPage = async (browser: Browser, config: AppConfig) => {
 const injectAssets = async (
   page: Page,
   type: "script" | "style",
-  files: AppConfig["browser"]["inject"]["css"]
+  files:
+    | AppConfig["browser"]["inject"]["js"]
+    | AppConfig["browser"]["inject"]["css"]
 ) => {
   const getTagOptions = (
-    asset: AppConfig["browser"]["inject"]["css"][0],
+    asset:
+      | AppConfig["browser"]["inject"]["js"][0]
+      | AppConfig["browser"]["inject"]["css"][0],
     tagOptions: FrameAddScriptTagOptions | FrameAddStyleTagOptions
   ) => {
     if (asset.url) {
@@ -53,7 +56,15 @@ const injectAssets = async (
   for (const asset of files) {
     switch (type) {
       case "script":
-        await page.addScriptTag(getTagOptions(asset, {}));
+        const evalScript = (asset as AppConfig["browser"]["inject"]["js"][0])
+          .eval;
+        if (evalScript) {
+          await page.evaluate((script: string) => {
+            eval(script);
+          }, evalScript);
+        } else {
+          await page.addScriptTag(getTagOptions(asset, {}));
+        }
         break;
       case "style":
         await page.addStyleTag(getTagOptions(asset, {}));
@@ -74,7 +85,9 @@ export const launchBrowserAndTakeSnapshot = async (
     executablePath: env.isProd
       ? process.env.PUPPETEER_EXECUTABLE_PATH
       : puppeteer.executablePath(),
-    // slowMo: 500,
+    ...(env.isDev
+      ? { devtools: true, protocolTimeout: 60 * 60 * 1000, slowMo: 100 }
+      : {}),
     ignoreDefaultArgs: ["--disable-extensions"],
     args: [
       "--no-sandbox",
@@ -91,6 +104,7 @@ export const launchBrowserAndTakeSnapshot = async (
       await page.goto(link, {
         waitUntil: "networkidle2",
       });
+      await page.waitForSelector(".tabset-content .tabset-panel");
       if (config.browser.inject.js.length) {
         await injectAssets(page, "script", config.browser.inject.js);
       }
@@ -100,7 +114,12 @@ export const launchBrowserAndTakeSnapshot = async (
       const pageTitle = await page.evaluate(() =>
         document.title.substring(0, document.title.lastIndexOf("|")).trim()
       );
+
+      await page.waitForNavigation({ waitUntil: "networkidle0" });
       await setTimeout(config.browser.inject.load_delay);
+      // await page.evaluate(() => {
+      //   debugger;
+      // });
       const fileName = `${pageTitle}.pdf`;
       pdfFileChunks.push(fileName);
       await page.pdf({

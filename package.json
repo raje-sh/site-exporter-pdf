@@ -4,7 +4,7 @@
   "description": "Export Wiki Pages To PDF",
   "main": "index.js",
   "scripts": {
-    "start:dev": "node --import=tsx index.ts",
+    "start:dev": "NODE_ENV=development node --import=tsx index.ts",
     "start": "NODE_ENV=production node --import=tsx index.ts"
   },
   "keywords": [],
@@ -12,11 +12,18 @@
   "license": "ISC",
   "dependencies": {
     "@puppeteer/replay": "^3.0.0",
+    "dotenv": "^16.4.5",
     "envalid": "^8.0.0",
+    "envsub": "^4.1.0",
     "joi": "^17.13.3",
     "js-yaml": "^4.1.0",
     "pdf-lib": "^1.17.1",
     "puppeteer": "^22.15.0",
     "tsx": "^4.16.5"
+  },
+  "devDependencies": {
+    "@types/shelljs": "^0.8.15",
+    "i": "^0.3.7",
+    "npm": "^10.8.2"
   }
 }

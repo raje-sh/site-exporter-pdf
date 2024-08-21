@@ -1,7 +1,20 @@
 import yaml from "js-yaml";
 import fs from "fs";
-import { env } from "./env";
 import Joi from "joi";
+import { cleanEnv, str } from "envalid";
+import envsub from "envsub";
+
+export const env = cleanEnv(process.env, {
+  CONFIG_FILE: str({
+    desc: "yaml config file path",
+    default: "./config.yml",
+    example: "/usr/app/config.yml",
+  }),
+  NODE_ENV: str({
+    choices: ["development", "test", "production"],
+    default: "production",
+  }),
+});
 
 type FileInjection = { file: string; url: string; content: string };
 export type AppConfig = {
@@ -14,7 +27,7 @@ export type AppConfig = {
     headless: boolean;
     inject: {
       css: Array<Partial<FileInjection>>;
-      js: Array<Partial<FileInjection>>;
+      js: Array<Partial<FileInjection & { eval: string }>>;
       load_delay: number;
     };
     viewport: {
@@ -28,24 +41,6 @@ export type AppConfig = {
     type: "single" | "separate";
     filename: string;
   };
-};
-
-const readEnvCookies = () => {
-  if (!env.SITE_COOKIES) return [];
-
-  return env.SITE_COOKIES.split(";")
-    .map((it) => it.trim())
-    .filter((it) => it.length)
-    .reduce<Array<{ key: string; value: string }>>((prev, curr) => {
-      const [key, value] = curr.split("=");
-      return [
-        ...prev,
-        {
-          key,
-          value,
-        },
-      ];
-    }, []);
 };
 
 // relative & absolute
@@ -66,7 +61,7 @@ const configSchema = Joi.object({
           value: Joi.string().required(),
         })
       )
-      .default(readEnvCookies()),
+      .default([]),
     links: Joi.array()
       .items(Joi.string().uri({ relativeOnly: true }))
       .min(1)
@@ -96,7 +91,8 @@ const configSchema = Joi.object({
             file: Joi.string(),
             content: Joi.string(),
             url: Joi.string(),
-          }).xor("file", "content", "url")
+            eval: Joi.string(),
+          }).xor("file", "content", "url", "eval")
         )
         .default([]),
     }).default(),
@@ -108,11 +104,18 @@ const configSchema = Joi.object({
   }).default(),
 }).required();
 
-export const parseConfig = (): AppConfig => {
-  if (!fs.existsSync(env.CONFIG_FILE_PATH)) {
-    throw new Error(`config file missing: ${env.CONFIG_FILE_PATH}`);
+export const parseConfig = async (): Promise<AppConfig> => {
+  if (!fs.existsSync(env.CONFIG_FILE)) {
+    throw new Error(`config file missing: ${env.CONFIG_FILE}`);
   }
-  const doc = yaml.load(fs.readFileSync(env.CONFIG_FILE_PATH, "utf-8"));
+  const configFilePathWithEnvSubst = `${env.CONFIG_FILE}.tmp`;
+  await envsub({
+    templateFile: env.CONFIG_FILE,
+    outputFile: configFilePathWithEnvSubst,
+    options: { protect: false },
+  });
+  const doc = yaml.load(fs.readFileSync(configFilePathWithEnvSubst, "utf-8"));
+  fs.unlinkSync(configFilePathWithEnvSubst);
   const { error, value } = configSchema.validate(doc, {
     abortEarly: false,
     stripUnknown: true,

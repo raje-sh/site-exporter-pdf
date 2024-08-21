@@ -1,3 +1,4 @@
+import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import {
@@ -5,21 +6,23 @@ import {
   launchBrowserAndTakeSnapshot,
   cleanOutputDirectoryExcept,
   parseConfig,
+  AppConfig,
 } from "./lib";
 
-const config = parseConfig();
-const getFullURI = (path: string) => `${config.site.base_url}/${path}`;
-const createOutputDirectoryIfNotExists = () => {
-  if (!fs.existsSync(config.output.dir)) {
-    fs.mkdirSync(config.output.dir);
+const getFullURI = (path: string, config: AppConfig) =>
+  `${config.site.base_url}/${path}`;
+const createDirectoryIfNotExists = (directory: string) => {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory);
   } else {
-    cleanOutputDirectoryExcept([], config.output.dir);
+    cleanOutputDirectoryExcept([], directory);
   }
 };
 
 (async () => {
-  createOutputDirectoryIfNotExists();
-  const links = config.site.links.map(getFullURI);
+  const config = await parseConfig();
+  createDirectoryIfNotExists(config.output.dir);
+  const links = config.site.links.map((it) => getFullURI(it, config));
   const result = await launchBrowserAndTakeSnapshot(links, config);
   if (config.output.type === "single") {
     const resultFileName = config.output.filename.concat(".pdf");
