@@ -1,5 +1,6 @@
 **/node_modules
 .env
 out
+example/out
 **/.DS_Store
 config.yml.tmp

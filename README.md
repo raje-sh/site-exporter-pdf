@@ -1,9 +1,12 @@
+## Demo
+
+<video src="./example/wiki-js-exporter-demo.mov" width="1280" height="720" controls onloadstart="this.playbackRate = 1.5;"></video>
+
 ## TODO
 
-- alter commits history and commiter account
+- hide taskfile->ImageName, chrome-hcl-logo
 - prep readme.md with usage instructions
-- prep demo gif
-  start wikijs, create-pages, copy jwt, prep config yaml, export in terminal, open pdf
+- alter commiter account
 - prep github actions
 - add build/lint/test scripts
 - remove blank spaces in pdf file
