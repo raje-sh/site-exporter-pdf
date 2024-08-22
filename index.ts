@@ -29,7 +29,10 @@ const createDirectoryIfNotExists = (directory: string) => {
   if (config.output.type === "single") {
     const resultFileName = config.output.filename.concat(".pdf");
     await mergePDFs(
-      result.chunks.map((it) => path.resolve(config.output.dir, it)),
+      links
+        .map((it) => result[it])
+        .filter((it) => it !== undefined)
+        .map((it) => path.resolve(config.output.dir, it)),
       path.join(config.output.dir, resultFileName)
     );
     cleanOutputDirectoryExcept([resultFileName], config.output.dir);

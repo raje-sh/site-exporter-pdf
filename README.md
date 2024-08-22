@@ -1,6 +1,5 @@
 ## TODO
 
-- optimize execution speed https://advancedweb.hu/how-to-speed-up-puppeteer-scraping-with-parallelization/
 - alter commits history and commiter account
 - prep readme.md with usage instructions
 - prep demo gif

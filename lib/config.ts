@@ -28,7 +28,7 @@ export type AppConfig = {
     inject: {
       css: Array<Partial<FileInjection>>;
       js: Array<Partial<FileInjection & { eval: string }>>;
-      load_delay: number;
+      asset_load_wait_ms: number;
     };
     viewport: {
       width: number;
@@ -41,6 +41,7 @@ export type AppConfig = {
     type: "single" | "separate";
     filename: string;
   };
+  concurrency: number;
 };
 
 // relative & absolute
@@ -75,7 +76,7 @@ const configSchema = Joi.object({
     }).default(),
     page_timeout: Joi.number().default(30 * 1000),
     inject: Joi.object({
-      load_delay: Joi.number().default(1 * 1000),
+      asset_load_wait_ms: Joi.number().default(1 * 100),
       css: Joi.array()
         .items(
           Joi.object({
@@ -102,6 +103,7 @@ const configSchema = Joi.object({
     type: Joi.string().valid("single", "separate").default("single"),
     filename: Joi.string().default("result"),
   }).default(),
+  concurrency: Joi.number().default(1),
 }).required();
 
 export const parseConfig = async (): Promise<AppConfig> => {

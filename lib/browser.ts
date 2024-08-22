@@ -8,6 +8,7 @@ import puppeteer, {
 import { setTimeout } from "node:timers/promises";
 import fs from "fs";
 import { AppConfig, env } from "./config";
+import pLimit from "p-limit";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
   const cookieDomain = config.site.base_url.split("://")[1].replace(/\/$/, "");
@@ -19,7 +20,6 @@ const setPageCookies = (page: Page, config: AppConfig) => {
     });
   });
 };
-const initPage = async (browser: Browser, config: AppConfig) => {};
 
 const injectAssets = async (
   page: Page,
@@ -106,63 +106,67 @@ const withPage =
     }
   };
 
-const processLink = async (link: string, config: AppConfig, page: Page) => {
-  console.log(`process: "${link}"`);
-  await page.goto(link, {
-    waitUntil: "networkidle2",
-  });
-  if (config.browser.inject.js.length) {
-    await injectAssets(page, "script", config.browser.inject.js);
-  }
-  if (config.browser.inject.css?.length) {
-    await injectAssets(page, "style", config.browser.inject.css);
-  }
-  const pageTitle = await page.evaluate(() =>
-    document.title.substring(0, document.title.lastIndexOf("|")).trim()
-  );
+const processLink = async (
+  link: string,
+  config: AppConfig,
+  browser: Browser
+) => {
+  return await withPage(
+    browser,
+    config
+  )(async (page: Page) => {
+    try {
+      console.log(`process: "${link}"`);
+      await page.goto(link, {
+        waitUntil: "networkidle2",
+      });
+      if (config.browser.inject.js.length) {
+        await injectAssets(page, "script", config.browser.inject.js);
+      }
+      if (config.browser.inject.css?.length) {
+        await injectAssets(page, "style", config.browser.inject.css);
+      }
+      const pageTitle = await page.evaluate(() =>
+        document.title.substring(0, document.title.lastIndexOf("|")).trim()
+      );
 
-  await setTimeout(config.browser.inject.load_delay);
-  // await page.evaluate(() => {
-  //   debugger;
-  // });
-  const fileName = `${pageTitle}.pdf`;
-
-  await page.pdf({
-    path: path.join(config.output.dir, fileName),
-    format: "A4",
-    margin: {
-      top: 20,
-      bottom: 20,
-      left: 20,
-      right: 20,
-    },
+      await setTimeout(config.browser.inject.asset_load_wait_ms);
+      // await page.evaluate(() => {
+      //   debugger;
+      // });
+      const fileName = `${pageTitle}.pdf`;
+      await page.pdf({
+        path: path.join(config.output.dir, fileName),
+        format: "A4",
+        margin: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20,
+        },
+      });
+      return fileName;
+    } catch (e) {
+      console.warn(`error: "${link}"`);
+      console.error(e);
+    }
   });
-  return fileName;
 };
 
 export const launchBrowserAndTakeSnapshot = async (
   links: string[],
   config: AppConfig
 ) => {
-  const pdfFileChunks: Array<string> = [];
-  return await withBrowser(async (browser: Browser) => {
-    for (const link of links) {
-      try {
-        const fileName = await withPage(
-          browser,
-          config
-        )(async (page: Page) => {
-          return await processLink(link, config, page);
-        });
-        pdfFileChunks.push(fileName);
-      } catch (e) {
-        console.warn(`error: "${link}"`);
-        console.error(e);
+  const parallelize = pLimit(config.concurrency);
+  const pdfFileChunks: Record<string, string> = {};
+  return (await withBrowser(async (browser: Browser) => {
+    const pushLink = async (link: string) => {
+      const fileName = await processLink(link, config, browser);
+      if (fileName) {
+        pdfFileChunks[link] = fileName;
       }
-    }
-
-    return {
-      chunks: pdfFileChunks,
     };
-  }, config);
+    await Promise.all(links.map((it) => parallelize(() => pushLink(it))));
+    return pdfFileChunks;
+  }, config)) as Record<string, string>;
 };
