@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "github.vscode-github-actions",
     "ms-vscode-remote.remote-containers"
   ]
 }

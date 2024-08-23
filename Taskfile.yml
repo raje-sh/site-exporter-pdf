@@ -1,20 +1,5 @@
 version: "3"
-vars:
-  WIKI_JS_DIR: example
 tasks:
-  export:
-    cmds:
-      - docker run -it --env-file ./.env --rm -v ./config.yml:/usr/src/app/config.yml -v ./out:/usr/src/app/out --cap-add=SYS_ADMIN --network="host" $IMAGE_NAME
-    env:
-      IMAGE_NAME: rasuhcl/wikijs-pdf-export:latest
-  wiki:up:
-    dir: "{{.WIKI_JS_DIR}}"
-    cmds:
-      - docker compose up -d
-  wiki:down:
-    dir: "{{.WIKI_JS_DIR}}"
-    cmds:
-      - docker compose down
   act:publish:
     cmds:
       - act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .github/act.publish.env -j publish;

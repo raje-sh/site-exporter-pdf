@@ -23,9 +23,9 @@ const createDirectoryIfNotExists = (directory: string) => {
   const config = await parseConfig();
   createDirectoryIfNotExists(config.output.dir);
   const links = config.site.links.map((it) => getFullURI(it, config));
-  console.time("scrap");
+  // console.time("scrap");
   const result = await launchBrowserAndTakeSnapshot(links, config);
-  console.timeEnd("scrap");
+  // console.timeEnd("scrap");
   if (config.output.type === "single") {
     const resultFileName = config.output.filename.concat(".pdf");
     await mergePDFs(

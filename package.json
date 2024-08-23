@@ -1,7 +1,7 @@
 {
-  "name": "wikijs-exporter-pdf",
+  "name": "site-exporter",
   "version": "1.0.0",
-  "description": "Export Wiki Pages To PDF",
+  "description": "Export websites as PDF",
   "main": "index.js",
   "scripts": {
     "start:dev": "NODE_ENV=development node --import=tsx index.ts",
