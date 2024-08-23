@@ -1,26 +1,29 @@
 site:
-  base_url: ${WIKI_BASE_URL:-http://localhost:3000}
+  # base_url: ${WIKI_BASE_URL:-http://localhost:3000}
+  # links:
+  #   - en/home
+  #   - en/page-2
+  #   - en/page-3
+  base_url: https://www.youtube.com
   links:
-    - en/home
-    - en/page-2
-    - en/page-3
+    - watch?v=ozOsx4rfFWs
   cookies:
     - key: jwt
       value: ${WIKIJS_JWT}
 browser:
   headless: ${CHROMIUM_HEADLESS_MODE:-true}
-  inject:
-    asset_load_wait_ms: 0
-    css:
-      - content: |
-          nav.v-navigation-drawer,header.v-sheet,footer.v-footer{display: none;}
-          main.v-main{padding: 0 !important;}
-    js:
-      - url: https://code.jquery.com/jquery-3.7.1.min.js
-      - content: |
-          $(document).ready(function(){
-            $('body').prepend('<h1 style="color: green">DYNAMIC JS CONTENT</h1>');
-          });
+  # inject:
+  #   asset_load_wait_ms: 0
+  #   css:
+  #     - content: |
+  #         nav.v-navigation-drawer,header.v-sheet,footer.v-footer{display: none;}
+  #         main.v-main{padding: 0 !important;}
+  #   js:
+  #     - url: https://code.jquery.com/jquery-3.7.1.min.js
+  #     - content: |
+  #         $(document).ready(function(){
+  #           $('body').prepend('<h1 style="color: green">DYNAMIC JS CONTENT</h1>');
+  #         });
 concurrency: 5
 output:
   filename: output
