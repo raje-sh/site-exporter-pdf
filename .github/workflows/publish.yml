@@ -1,8 +1,15 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*'
+# on:
+#   release:
+#     types: [published]
+
+env:
+  IMAGE_NAME: site-pdf-exporter
 
 jobs:
   publish:
@@ -11,26 +18,9 @@ jobs:
     permissions:
       packages: write
       contents: read
-      attestations: write
-      id-token: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
-
-      # - name: Login to Dockerhub
-      #   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_PAT }}
-
-      # - name: 'DockerHub: Build and push'
-      #   id: push-docker-hub
-      #   uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-      #   with:
-      #     context: .
-      #     file: ./Dockerfile
-      #     push: true
-      #     tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME}}:latest
       
       - name: Login to GHCR
         uses: docker/login-action@v1
@@ -42,5 +32,6 @@ jobs:
       - name: 'GHCR: Build and push'
         id: push-ghcr
         run: |
-          docker build . --tag ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest
-          docker push ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest
+          IMAGE_ID="ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest"
+          docker build . --tag $IMAGE_ID
+          docker push $IMAGE_ID
