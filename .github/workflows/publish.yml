@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish:
-    name: Push Docker image to Docker Hub
+    name: Push Container Image
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -17,17 +17,30 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Login to Dockerhub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PAT }}
+      # - name: Login to Dockerhub
+      #   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_PAT }}
 
-      - name: Build and push
-        id: push
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      # - name: 'DockerHub: Build and push'
+      #   id: push-docker-hub
+      #   uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME}}:latest
+      
+      - name: Login to GHCR
+        uses: docker/login-action@v1
         with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}:latest
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: 'GHCR: Build and push'
+        id: push-ghcr
+        run: |
+          docker build . --tag ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest
+          docker push ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest
