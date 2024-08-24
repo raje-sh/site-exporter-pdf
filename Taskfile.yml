@@ -1,6 +1,0 @@
-version: "3"
-tasks:
-  act:publish:
-    cmds:
-      - act --env-file .github/act.publish.env -j publish;
-      # - act -s DOCKERHUB_PAT -s DOCKERHUB_USERNAME --env-file .github/act.publish.env -j publish;

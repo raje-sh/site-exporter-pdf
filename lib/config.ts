@@ -40,6 +40,7 @@ export type AppConfig = {
     dir: string;
     type: "single" | "separate";
     filename: string;
+    filenameEval: string;
   };
   concurrency: number;
 };
@@ -101,7 +102,20 @@ const configSchema = Joi.object({
   output: Joi.object({
     dir: Joi.string().regex(pathRegex).default("./out"),
     type: Joi.string().valid("single", "separate").default("single"),
-    filename: Joi.string().default("result"),
+    filename: Joi.string().default("result").when('type', {
+      is: 'separate',
+      then: Joi.forbidden().messages({
+        'any.unknown': '"output.filename" is not allowed when "output.type" is set to "separate"'
+    }),
+      otherwise: Joi.optional()
+    }),
+    filenameEval: Joi.string().default(`document.title.replace(/[/\\?%*:|"<>]/g, '_').trim()`).when('type', {
+      is: 'single',
+      then: Joi.forbidden().messages({
+        'any.unknown': '"output.filenameEval" is not allowed when "output.type" is set to "single"'
+    }),
+      otherwise: Joi.optional()
+    }),
   }).default(),
   concurrency: Joi.number().default(1),
 }).required();

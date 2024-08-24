@@ -1,7 +1,8 @@
 site:
   base_url: https://www.youtube.com
   links:
-    - watch?v=ozOsx4rfFWs
+    - /watch?v=ozOsx4rfFWs
+    - /watch?v=05hdf64yVQU
   # cookies:
   #   - key: jwt
   #     value: value
@@ -24,6 +25,8 @@ browser:
   # page_timeout: 20000
 # concurrency: 5
 output:
-  filename: output
   dir: ./out
   type: single
+  filename: output
+  # type: separate
+  # filenameEval: document.title.substr(0, 10)

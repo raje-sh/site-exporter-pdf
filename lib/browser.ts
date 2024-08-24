@@ -106,10 +106,18 @@ const withPage =
     }
   };
 
+const getFileNameEvalScript = (config: AppConfig) : string => {
+  if(config.output.type === 'single') {
+    return "encodeURIComponent(document.URL).replace(/%/g, '_')";
+  }
+  return config.output.filenameEval;
+}
+
 const processLink = async (
   link: string,
   config: AppConfig,
-  browser: Browser
+  browser: Browser,
+  fileNameParserScript: string
 ) => {
   return await withPage(
     browser,
@@ -126,10 +134,10 @@ const processLink = async (
       if (config.browser.inject.css?.length) {
         await injectAssets(page, "style", config.browser.inject.css);
       }
-      const pageTitle = await page.evaluate(() =>
-        document.title.substring(0, document.title.lastIndexOf("|")).trim()
+      const pageTitle = await page.evaluate((script) =>
+        eval(script), fileNameParserScript
+        // document.title.substring(0, document.title.lastIndexOf("|")).trim()
       );
-
       await setTimeout(config.browser.inject.asset_load_wait_ms);
       // await page.evaluate(() => {
       //   debugger;
@@ -159,9 +167,10 @@ export const launchBrowserAndTakeSnapshot = async (
 ) => {
   const parallelize = pLimit(config.concurrency);
   const pdfFileChunks: Record<string, string> = {};
+  const fileNameParserScript = getFileNameEvalScript(config);
   return (await withBrowser(async (browser: Browser) => {
     const pushLink = async (link: string) => {
-      const fileName = await processLink(link, config, browser);
+      const fileName = await processLink(link, config, browser, fileNameParserScript);
       if (fileName) {
         pdfFileChunks[link] = fileName;
       }
