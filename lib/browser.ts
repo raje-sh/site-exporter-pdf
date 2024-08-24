@@ -47,6 +47,7 @@ const injectAssets = async (
   for (const asset of files) {
     switch (type) {
       case "script":
+        // eslint-disable-next-line
         const evalScript = (asset as AppConfig["browser"]["inject"]["js"][0])
           .eval;
         if (evalScript) {
@@ -66,7 +67,7 @@ const injectAssets = async (
   }
 };
 
-const withBrowser = async (fn: Function, config: AppConfig) => {
+const withBrowser = async <Type>(fn: (browser: Browser) => Promise<Type>, config: AppConfig) => {
   const browser = await puppeteer.launch({
     headless: config.browser.headless,
     executablePath: env.isProd
@@ -91,7 +92,7 @@ const withBrowser = async (fn: Function, config: AppConfig) => {
 };
 
 const withPage =
-  (browser: Browser, config: AppConfig) => async (fn: Function) => {
+  <Type>(browser: Browser, config: AppConfig) => async (fn: (page: Page) => Promise<Type>) => {
     const page = await browser.newPage();
     setPageCookies(page, config);
     page.setDefaultTimeout(config.browser.page_timeout);
@@ -106,8 +107,8 @@ const withPage =
     }
   };
 
-const getFileNameEvalScript = (config: AppConfig) : string => {
-  if(config.output.type === 'single') {
+const getFileNameEvalScript = (config: AppConfig): string => {
+  if (config.output.type === 'single') {
     return "encodeURIComponent(document.URL).replace(/%/g, '_')";
   }
   return config.output.filenameEval;
@@ -119,7 +120,7 @@ const processLink = async (
   browser: Browser,
   fileNameParserScript: string
 ) => {
-  return await withPage(
+  return await withPage<string | undefined>(
     browser,
     config
   )(async (page: Page) => {
@@ -136,12 +137,8 @@ const processLink = async (
       }
       const pageTitle = await page.evaluate((script) =>
         eval(script), fileNameParserScript
-        // document.title.substring(0, document.title.lastIndexOf("|")).trim()
       );
       await setTimeout(config.browser.inject.asset_load_wait_ms);
-      // await page.evaluate(() => {
-      //   debugger;
-      // });
       const fileName = `${pageTitle}.pdf`;
       await page.pdf({
         path: path.join(config.output.dir, fileName),
@@ -173,6 +170,8 @@ export const launchBrowserAndTakeSnapshot = async (
       const fileName = await processLink(link, config, browser, fileNameParserScript);
       if (fileName) {
         pdfFileChunks[link] = fileName;
+      } else {
+        console.warn('failed processing:', link);
       }
     };
     await Promise.all(links.map((it) => parallelize(() => pushLink(it))));

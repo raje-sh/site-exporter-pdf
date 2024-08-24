@@ -1,7 +1,7 @@
 import fs from "fs";
 import { PDFDocument } from "pdf-lib";
 
-export async function mergePDFs(pdfPaths: Array<string>, outputPath: string) {
+export async function mergePDFs(pdfPaths: string[], outputPath: string) {
   const mergedPdf = await PDFDocument.create();
   for (const pdfPath of pdfPaths) {
     const pdfBytes = fs.readFileSync(pdfPath);

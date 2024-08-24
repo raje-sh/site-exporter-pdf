@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "NODE_ENV=development node --import=tsx index.ts",
-    "start": "NODE_ENV=production node --import=tsx index.ts"
+    "start": "NODE_ENV=production node --import=tsx index.ts",
+    "lint": "npx eslint ."
   },
   "keywords": [],
   "author": "Rajesh Sundaram",
@@ -23,8 +24,13 @@
     "tsx": "^4.16.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/eslint__js": "^8.42.3",
     "@types/shelljs": "^0.8.15",
+    "eslint": "^9.9.1",
     "i": "^0.3.7",
-    "npm": "^10.8.2"
+    "npm": "^10.8.2",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.2.0"
   }
 }

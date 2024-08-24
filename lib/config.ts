@@ -16,18 +16,18 @@ export const env = cleanEnv(process.env, {
   }),
 });
 
-type FileInjection = { file: string; url: string; content: string };
-export type AppConfig = {
+interface FileInjection { file: string; url: string; content: string }
+export interface AppConfig {
   site: {
     base_url: string;
-    links: Array<string>;
-    cookies: Array<{ key: string; value: string }>;
+    links: string[];
+    cookies: { key: string; value: string }[];
   };
   browser: {
     headless: boolean;
     inject: {
-      css: Array<Partial<FileInjection>>;
-      js: Array<Partial<FileInjection & { eval: string }>>;
+      css: Partial<FileInjection>[];
+      js: Partial<FileInjection & { eval: string }>[];
       asset_load_wait_ms: number;
     };
     viewport: {
@@ -43,10 +43,10 @@ export type AppConfig = {
     filenameEval: string;
   };
   concurrency: number;
-};
+}
 
-// relative & absolute
-const pathRegex = /^(\/[^\/\0]*(\/[^\/\0]*)*|(\.\/|\.\.\/|[^\/].*))$/;
+// eslint-disable-next-line 
+const relAbsPathRegex = /^(\/[^\/\0]*(\/[^\/\0]*)*|(\.\/|\.\.\/|[^\/].*))$/;
 const configSchema = Joi.object({
   site: Joi.object({
     base_url: Joi.string()
@@ -100,20 +100,20 @@ const configSchema = Joi.object({
     }).default(),
   }).default(),
   output: Joi.object({
-    dir: Joi.string().regex(pathRegex).default("./out"),
+    dir: Joi.string().regex(relAbsPathRegex).default("./out"),
     type: Joi.string().valid("single", "separate").default("single"),
     filename: Joi.string().default("result").when('type', {
       is: 'separate',
       then: Joi.forbidden().messages({
         'any.unknown': '"output.filename" is not allowed when "output.type" is set to "separate"'
-    }),
+      }),
       otherwise: Joi.optional()
     }),
     filenameEval: Joi.string().default(`document.title.replace(/[/\\?%*:|"<>]/g, '_').trim()`).when('type', {
       is: 'single',
       then: Joi.forbidden().messages({
         'any.unknown': '"output.filenameEval" is not allowed when "output.type" is set to "single"'
-    }),
+      }),
       otherwise: Joi.optional()
     }),
   }).default(),

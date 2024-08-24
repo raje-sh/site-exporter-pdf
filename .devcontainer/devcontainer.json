@@ -30,7 +30,8 @@
         "tomoki1207.pdf",
         "Gruntfuggly.todo-tree",
         "vivaxy.vscode-conventional-commits",
-        "ChakrounAnas.turbo-console-log"
+        "ChakrounAnas.turbo-console-log",
+        "dbaeumer.vscode-eslint"
       ]
     }
   }

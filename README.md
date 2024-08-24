@@ -4,13 +4,12 @@
 
 ## TODO
 
-- https://stackoverflow.com/questions/4279611/how-to-embed-a-video-into-github-readme-md
-- opensource two repo: website-exporter, wikijs-pdf-exporter & attach wiki-repo as example to main repo sub-module.
 - prep readme.md with usage instructions
   - problem with inline js content `${env-var-issue}`
 - alter commiter account
-- prep demo video with non-wiki site
-- add build/lint/test scripts
+- prep demo video with non-wiki site https://stackoverflow.com/a/4279746/1092815
+  - attach wiki-repo as example to main repo sub-module.
+- add test scripts
 
 # Reference Links
 

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 export const cleanOutputDirectoryExcept = (
-  whitelistedFileNameList: Array<string>,
+  whitelistedFileNameList: string[],
   outputDirectory: string
 ) => {
   const files = fs.readdirSync(outputDirectory);
