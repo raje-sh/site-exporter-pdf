@@ -16,18 +16,21 @@
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
   },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "github.vscode-github-actions"
-      ]
-    }
-  },
   "postCreateCommand": "npm i",
   "containerEnv": {
     "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium",
     "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
     "SITE_BASE_URL": "http://host.docker.internal:3000",
     "CHROMIUM_HEADLESS_MODE": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "alefragnani.Bookmarks",
+        "tomoki1207.pdf",
+        "Gruntfuggly.todo-tree",
+        "vivaxy.vscode-conventional-commits"
+      ]
+    }
   }
 }
