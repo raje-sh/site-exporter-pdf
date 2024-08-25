@@ -30,3 +30,5 @@ output:
   filename: output
   # type: separate
   # filenameEval: document.title.substr(0, 10)
+  pdfOptionsAsJSON: '{"margin": {"top": 100, "right": 100, "bottom": 100, "left": 100}, "headerTemplate": "<h1>who AM I</h1>"}'
+  # https://github.com/puppeteer/puppeteer/blob/e25a4a1a890b662680a9fcc4cb24eda09e8154c3/packages/puppeteer-core/src/common/PDFOptions.ts#L73

@@ -28,6 +28,9 @@ docker run -it --rm -v ./config.yml:/usr/src/app/config.yml -v ./out:/usr/src/ap
 - `--cap-add=SYS_ADMIN` capability is needed to enable Chrome sandbox that makes the browser more secure. 
 - `--network="host"` is needed when the target site is running on the same host as the Docker container.
 
+## PDFOptions
+https://github.com/puppeteer/puppeteer/blob/e25a4a1a890b662680a9fcc4cb24eda09e8154c3/packages/puppeteer-core/src/common/PDFOptions.ts#L73
+
 # Reference Links
 
 - https://raslasarslas.medium.com/how-to-make-work-puppeteer-in-docker-both-in-local-en-prod-env-bb92628b2da6

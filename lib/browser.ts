@@ -142,13 +142,8 @@ const processLink = async (
       const fileName = `${pageTitle}.pdf`;
       await page.pdf({
         path: path.join(config.output.dir, fileName),
-        format: "A4",
-        margin: {
-          top: 20,
-          bottom: 20,
-          left: 20,
-          right: 20,
-        },
+        timeout: config.browser.pageTimeout,
+        ...config.output.pdfOptions
       });
       return fileName;
     } catch (e) {

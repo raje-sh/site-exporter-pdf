@@ -1,4 +1,5 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
+// eslint-disable-next-line no-undef
 module.exports = {
   roots: ["<rootDir>/lib/tests"],
   preset: "ts-jest",

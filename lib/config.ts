@@ -2,6 +2,18 @@ import yaml from "js-yaml";
 import fs from "fs";
 import Joi from "joi";
 import envsub from "envsub";
+import { PDFOptions } from "puppeteer";
+
+const defaultPDFOptions: Omit<PDFOptions, 'path' | 'timeout'> = {
+  format: "A4",
+  margin: {
+    top: 20,
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+}
+
 
 interface FileInjection { file: string; url: string; content: string }
 export interface AppConfig {
@@ -28,6 +40,7 @@ export interface AppConfig {
     type: "single" | "separate";
     filename?: string;
     filenameEval?: string;
+    pdfOptions?: Omit<PDFOptions, 'path' | 'timeout'>;
   };
   concurrency: number;
 }
@@ -103,6 +116,8 @@ const configSchema = Joi.object({
       }),
       otherwise: Joi.optional()
     }),
+    pdfOptionsAsJSON: Joi.string().default(JSON.stringify(defaultPDFOptions)),
+    // pdfOptionsAsJSON: Joi.string().default(JSON.stringify(defaultPDFOptions)),
   }).default(),
   concurrency: Joi.number().default(1),
 }).required();
@@ -127,5 +142,14 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
     const errorMsg = error.details.map((it) => it.message).join("\n");
     throw new Error(errorMsg);
   }
+  value.output.pdfOptions = parsePDFOptions(value.output.pdfOptionsAsJSON);
   return value;
 };
+
+const parsePDFOptions = (json: string) => {
+  const pdfOptions = JSON.parse(json!!.trim())
+  const allowedProps = ['scale', 'displayHeaderFooter', 'headerTemplate', 'footerTemplate', 'printBackground', 'landscape', 'pageRanges', 'format', 'width', 'height', 'preferCSSPageSize', 'margin', 'path', 'omitBackground', 'tagged', 'outline', 'timeout', 'waitForFonts']
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return Object.keys(pdfOptions).filter(it => allowedProps.includes(it)).reduce((prev, it) => ({ ...prev, [it]: pdfOptions[it] }), {})
+}
