@@ -3,6 +3,7 @@ import fs from "fs";
 import Joi from "joi";
 import envsub from "envsub";
 import { PDFOptions } from "puppeteer";
+import { debug, error } from "./logger";
 
 const defaultPDFOptions: Omit<PDFOptions, 'path'> = {
   format: "A4",
@@ -123,7 +124,9 @@ const configSchema = Joi.object({
 }).required();
 
 export const parseConfig = async (configFile: string): Promise<AppConfig> => {
+  debug('parsing config file: %s', configFile);
   if (!fs.existsSync(configFile)) {
+    debug('config file: %s not found', configFile);
     throw new Error(`config file missing: ${configFile}`);
   }
   const configFilePathWithEnvSubst = `${configFile}.tmp`;
@@ -132,17 +135,21 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
     outputFile: configFilePathWithEnvSubst,
     options: { protect: false },
   });
+  debug('substituted env-vars in config file to %s', configFilePathWithEnvSubst);
   const doc = yaml.load(fs.readFileSync(configFilePathWithEnvSubst, "utf-8"));
   fs.unlinkSync(configFilePathWithEnvSubst);
-  const { error, value } = configSchema.validate(doc, {
+  debug('deleted tmp config file: %s', configFilePathWithEnvSubst);
+  const { error: errorDetails, value } = configSchema.validate(doc, {
     abortEarly: false,
     stripUnknown: true,
   });
-  if (error) {
-    const errorMsg = error.details.map((it) => it.message).join("\n");
+  if (errorDetails) {
+    const errorMsg = errorDetails.details.map((it) => it.message).join("\n");
+    error('config validation errors found: %o', errorMsg);
     throw new Error(errorMsg);
   }
   value.output.pdfOptions = parsePDFOptions(value.output.pdfOptionsAsJSON);
+  debug('config validation done: %o', value);
   return value;
 };
 

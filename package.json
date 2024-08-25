@@ -4,7 +4,7 @@
   "description": "Export websites as PDF",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development node --import=tsx index.ts",
+    "dev": "NODE_ENV=development DEBUG=site-exporter:* node --import=tsx index.ts",
     "start": "NODE_ENV=production node --import=tsx index.ts",
     "lint": "npx eslint .",
     "test": "jest --coverage"
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@puppeteer/replay": "^3.0.0",
+    "debug": "^4.3.6",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",
     "envsub": "^4.1.0",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@types/debug": "^4.1.12",
     "@types/download": "^8.0.5",
     "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.12",

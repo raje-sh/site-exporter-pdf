@@ -1,8 +1,10 @@
 site:
-  baseUrl: https://www.youtube.com
+  # baseUrl: https://www.youtube.com
+  baseUrl: https://stackoverflow.com
   links:
-    - /watch?v=ozOsx4rfFWs
-    - /watch?v=05hdf64yVQU
+    # - /watch?v=ozOsx4rfFWs
+    # - /watch?v=05hdf64yVQU
+    - /questions/70487251/webscraping-timeouterror-navigation-timeout-of-30000-ms-exceeded
   # cookies:
   #   - key: jwt
   #     value: value

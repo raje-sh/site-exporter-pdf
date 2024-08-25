@@ -10,6 +10,7 @@ import fs from "fs";
 import { AppConfig } from "./config";
 import { env } from "./env";
 import pLimit from "p-limit";
+import { error, debug } from "./logger";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
   const cookieDomain = config.site.baseUrl.split("://")[1].replace(/\/$/, "");
@@ -55,15 +56,18 @@ const injectAssets = async (
           await page.evaluate((script: string) => {
             eval(script);
           }, evalScript);
+          debug('injecting eval script: %s', evalScript);
         } else {
           await page.addScriptTag(getTagOptions(asset, {}));
+          debug('injecting script: %s', asset);
         }
         break;
       case "style":
+        debug('injecting style: %s', asset);
         await page.addStyleTag(getTagOptions(asset, {}));
         break;
       default:
-        console.warn("unsupported injection");
+        error("unknown injection type: %s", type);
     }
   }
 };
@@ -79,9 +83,9 @@ const withBrowser = async <Type>(fn: (browser: Browser) => Promise<Type>, config
       : {}),
     ignoreDefaultArgs: ["--disable-extensions"],
     args: [
-      "--no-sandbox",
+      // "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--no-zygote",
+      // "--no-zygote",
     ],
   });
   try {
@@ -125,7 +129,7 @@ const processLink = async (
     config
   )(async (page: Page) => {
     try {
-      console.log(`process: "${link}"`);
+      debug("processing: %s", link);
       await page.goto(link, {
         waitUntil: "networkidle2",
       });
@@ -138,6 +142,7 @@ const processLink = async (
       const pageTitle = await page.evaluate((script) =>
         eval(script), fileNameParserScript
       );
+      debug('evaluated page title: "%s" and wait for asset to load: %d ms', pageTitle, config.browser.inject.assetLoadWaitMs);
       await setTimeout(config.browser.inject.assetLoadWaitMs);
       const fileName = `${pageTitle}.pdf`;
       await page.pdf({
@@ -147,8 +152,7 @@ const processLink = async (
       });
       return fileName;
     } catch (e) {
-      console.warn(`error: "${link}"`);
-      console.error(e);
+      error('failed processing: %s, error: %o', link, e);
     }
   });
 };
@@ -165,11 +169,11 @@ export const launchBrowserAndTakeSnapshot = async (
       const fileName = await processLink(link, config, browser, fileNameParserScript);
       if (fileName) {
         pdfFileChunks[link] = fileName;
-      } else {
-        console.warn('failed processing:', link);
+        debug('processed: %s, output: %s', link, fileName);
       }
     };
     await Promise.all(links.map((it) => parallelize(() => pushLink(it))));
+    debug('finsished processing all "%d" links', links.length);
     return pdfFileChunks;
   }, config)) as Record<string, string>;
 };

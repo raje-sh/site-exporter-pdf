@@ -1,5 +1,7 @@
 # Web Page to PDF Converter
 This application converts web page links into PDF documents and is designed for seamless usage via Docker.
+<!-- TODO -->
+<!-- <video src="./example/js-exporter-demo.mov" width="1280" height="720" controls onloadstart="this.playbackRate = 1.5;"></video> -->
 
 ## Features
 - Converts any web page link to a PDF document.
@@ -21,11 +23,11 @@ Create the necessary directories and configuration file on your host machine:
 Execute the following command to start the application:
 
 ```bash
-docker run -it --rm --cap-add=SYS_ADMIN -v ./config.yml:/app/config.yml -v ./out:/app/out ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
+docker run -it --rm -v ./config.yml:/app/config.yml -v ./out:/app/out ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
 ```
-- `-v ./config.yml:/app/config.yml`: Maps your local configuration file to the container.
-- `-v ./out:/app/out`: Maps your local output directory to the container, where PDFs will be saved.
-- `--cap-add=SYS_ADMIN` capability is needed to enable Chrome sandbox that makes the browser more secure. 
+- `-v <path_to_config_file>:/app/config.yml`: Maps your local configuration file to the container.
+- `-v <path_to_output_dir>:/app/out`: Maps your local output directory to the container, where PDFs will be saved.
+<!-- - `--cap-add=SYS_ADMIN` capability is needed to enable Chrome sandbox that makes the browser more secure.  -->
 - (optional) `--network="host"` is needed when the target site is also running on the same host as a Docker container.
 
 ### 3. View the Output 🎉
@@ -63,6 +65,18 @@ site:
 ```
 In this example, the `SECRET_AUTH_TOKEN` environment variable is used to set the value of the authToken cookie. If `SECRET_AUTH_TOKEN` is not set, the default value `default-token` will be used.
 
+#### Passing Environment Variables to the Container
+To pass environment variables into a Docker container, you can either use an .env file or the -e flag when running the docker run command.
+```bash
+docker run -it --rm --cap-add=SYS_ADMIN \
+  -e SECRET_AUTH_TOKEN=your-secret-token \
+  --env-file .env \
+  -v ./config.yml:/app/config.yml \
+  -v ./out:/app/out \
+  ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
+
+```
+
 ### JS and CSS Injection
 
 #### Example configuration:
@@ -77,7 +91,7 @@ browser:
       - file: /app/inject/styles/custom.css
       - content: |
           body { background-color: lightgray; }
-      - url: "https://example.com/styles.css"
+      - url: https://example.com/styles.css
     js:
       - file: /app/inject/scripts/custom.js
       - content: |
@@ -90,6 +104,11 @@ browser:
 # (Bottom configuration details omitted)
 # ...
 ```
+#### Warning
+When injecting JavaScript as a content string in the `config.yml` file, be aware that JavaScript expressions such as `${}` may be replaced with an empty string. This issue can lead to unexpected behavior if your JavaScript code relies on these expressions.
+
+To avoid problems, consider using other injection methods such as files or URLs, or ensure that your content string does not include `${}` expressions.
+
 #### Example Docker run command with volume mapping:
 
 ```bash
@@ -123,26 +142,18 @@ Contributions are welcome! Please submit a pull request or open an issue to disc
 ## License
 This project is licensed under the `MIT License`. See the [LICENSE](./LICENSE) file for more details.
 
-<!-- <video src="./example/js-exporter-demo.mov" width="1280" height="720" controls onloadstart="this.playbackRate = 1.5;"></video> -->
-
 ## TODO
 
-- prep readme.md with usage instructions
-  - problem with inline js content `${env-var-issue}`
+- investigate why not working in codespaces
 - alter commiter account
+- semver versioning
+- update github actions to update package version based on tags
+- fix cicd warnings https://github.com/rajesh-sundaram-hcl/wikijs-pdf-exporter/actions/runs/10547223893
 - prep demo video with non-wiki site https://stackoverflow.com/a/4279746/1092815
   - attach wiki-repo as example to main repo sub-module.
-- add debug mode logs
-- investigate why not working in codespaces
-- update github actions to update package version based on tags
-- optimize docker image size (current: last 7 layers are downloaded every new version pull)
+- pin the oss repos in github
+- optimize docker image size (last 7 layers are downloaded every new pull): puppeteer: 2.26GB, site-exporter: 2.6GB, inspect docker image layers
 - change repo-name in issue-templates
-- semver versioning
-- --cap-add=SYS_ADMIN => Needed since no-sandbox flag enabled?
-
-
-
-# Reference Links
-
-- https://raslasarslas.medium.com/how-to-make-work-puppeteer-in-docker-both-in-local-en-prod-env-bb92628b2da6
-- https://youtu.be/6cm6G78ZDmM?si=Gndf4Tkdw3CLsiTv
+- allow setting a domain in cookie to allow muliti-site scraping
+- remove base_url and allow base_url in links
+- release-please config

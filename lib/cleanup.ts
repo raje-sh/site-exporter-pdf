@@ -1,3 +1,4 @@
+import { debug } from "./logger";
 import fs from "fs";
 import path from "path";
 
@@ -15,5 +16,5 @@ export const cleanOutputDirectoryExcept = (
     const filePath = path.join(outputDirectory, it);
     fs.unlinkSync(filePath);
   });
-  console.debug("Deleted Files: ", filesNotInList.join(", "));
+  debug("Deleted Files: %d", filesNotInList.length);
 };

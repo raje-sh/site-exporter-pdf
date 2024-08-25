@@ -3,3 +3,4 @@ export * from "./cleanup";
 export * from "./pdf";
 export * from "./config";
 export * from "./env";
+export * from "./logger";
