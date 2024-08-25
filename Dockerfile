@@ -4,12 +4,12 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 USER root
 RUN npm install -g npm
-WORKDIR /usr/src/app
+WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --only=production
 COPY . .
 
-RUN chown -Rh pptruser:pptruser /usr/src/app
-RUN chmod -R 777 /usr/src/app
+RUN chown -Rh pptruser:pptruser /app
+RUN chmod -R 777 /app
 USER pptruser
 CMD ["npm", "run", "start"]

@@ -90,7 +90,7 @@ describe('config', () => {
         expect(config.browser.viewport.width).toEqual(1260);
         expect(config.browser.viewport.height).toEqual(968);
         expect(config.browser.pageTimeout).toEqual(30000);
-        expect(config.concurrency).toEqual(1);
+        expect(config.concurrency).toEqual(3);
         expect(config.output.dir).toEqual('./out');
         expect(config.output.type).toEqual('single');
         expect(config.output.filename).toEqual('result');

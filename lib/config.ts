@@ -4,7 +4,7 @@ import Joi from "joi";
 import envsub from "envsub";
 import { PDFOptions } from "puppeteer";
 
-const defaultPDFOptions: Omit<PDFOptions, 'path' | 'timeout'> = {
+const defaultPDFOptions: Omit<PDFOptions, 'path'> = {
   format: "A4",
   margin: {
     top: 20,
@@ -40,7 +40,7 @@ export interface AppConfig {
     type: "single" | "separate";
     filename?: string;
     filenameEval?: string;
-    pdfOptions?: Omit<PDFOptions, 'path' | 'timeout'>;
+    pdfOptions?: Omit<PDFOptions, 'path'>;
   };
   concurrency: number;
 }
@@ -119,7 +119,7 @@ const configSchema = Joi.object({
     pdfOptionsAsJSON: Joi.string().default(JSON.stringify(defaultPDFOptions)),
     // pdfOptionsAsJSON: Joi.string().default(JSON.stringify(defaultPDFOptions)),
   }).default(),
-  concurrency: Joi.number().default(1),
+  concurrency: Joi.number().default(3),
 }).required();
 
 export const parseConfig = async (configFile: string): Promise<AppConfig> => {
@@ -148,7 +148,7 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
 
 const parsePDFOptions = (json: string) => {
   const pdfOptions = JSON.parse(json!!.trim())
-  const allowedProps = ['scale', 'displayHeaderFooter', 'headerTemplate', 'footerTemplate', 'printBackground', 'landscape', 'pageRanges', 'format', 'width', 'height', 'preferCSSPageSize', 'margin', 'path', 'omitBackground', 'tagged', 'outline', 'timeout', 'waitForFonts']
+  const allowedProps = ['timeout', 'scale', 'displayHeaderFooter', 'headerTemplate', 'footerTemplate', 'printBackground', 'landscape', 'pageRanges', 'format', 'width', 'height', 'preferCSSPageSize', 'margin', 'path', 'omitBackground', 'tagged', 'outline', 'timeout', 'waitForFonts']
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return Object.keys(pdfOptions).filter(it => allowedProps.includes(it)).reduce((prev, it) => ({ ...prev, [it]: pdfOptions[it] }), {})
