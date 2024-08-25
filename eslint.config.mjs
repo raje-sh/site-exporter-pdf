@@ -10,7 +10,8 @@ export default tseslint.config(
   ...tseslint.configs.stylistic,
   {
     rules: {
-      '@typescript-eslint/array-type': 2
+      '@typescript-eslint/no-non-null-assertion': 0,
+      '@typescript-eslint/no-extra-non-null-assertion': 0,
     }
   }
 );

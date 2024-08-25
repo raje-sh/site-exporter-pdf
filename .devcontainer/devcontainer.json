@@ -32,7 +32,8 @@
         "vivaxy.vscode-conventional-commits",
         "ChakrounAnas.turbo-console-log",
         "dbaeumer.vscode-eslint",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "ms-vscode.vscode-typescript-next"
       ]
     }
   }

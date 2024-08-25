@@ -21,9 +21,9 @@ const createDirectoryIfNotExists = (directory: string) => {
 
 (async () => {
   if (env.isDev) { console.time("export"); }
-  const config = await parseConfig();
+  const config = await parseConfig(env.CONFIG_FILE);
   createDirectoryIfNotExists(config.output.dir);
-  const links = config.site.links.map((it) => getFullURI(config.site.base_url, it));
+  const links = config.site.links.map((it) => getFullURI(config.site.baseUrl, it));
   const result = await launchBrowserAndTakeSnapshot(links, config);
   if (config.output.type === "single") {
     const resultFileName = config.output.filename.concat(".pdf");

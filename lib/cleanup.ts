@@ -9,11 +9,11 @@ export const cleanOutputDirectoryExcept = (
   const filesNotInList = files.filter(
     (it) => !whitelistedFileNameList.includes(it)
   );
-  if (filesNotInList.length) {
-    filesNotInList.forEach((it) => {
-      const filePath = path.join(outputDirectory, it);
-      fs.unlinkSync(filePath);
-    });
-    console.debug("Deleted Files: ", filesNotInList.join(", "));
-  }
+  if (!filesNotInList.length) return;
+
+  filesNotInList.forEach((it) => {
+    const filePath = path.join(outputDirectory, it);
+    fs.unlinkSync(filePath);
+  });
+  console.debug("Deleted Files: ", filesNotInList.join(", "));
 };

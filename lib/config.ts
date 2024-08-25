@@ -1,25 +1,12 @@
 import yaml from "js-yaml";
 import fs from "fs";
 import Joi from "joi";
-import { cleanEnv, str } from "envalid";
 import envsub from "envsub";
-
-export const env = cleanEnv(process.env, {
-  CONFIG_FILE: str({
-    desc: "yaml config file path",
-    default: "./config.yml",
-    example: "/usr/app/config.yml",
-  }),
-  NODE_ENV: str({
-    choices: ["development", "test", "production"],
-    default: "production",
-  }),
-});
 
 interface FileInjection { file: string; url: string; content: string }
 export interface AppConfig {
   site: {
-    base_url: string;
+    baseUrl: string;
     links: string[];
     cookies: { key: string; value: string }[];
   };
@@ -28,19 +15,19 @@ export interface AppConfig {
     inject: {
       css: Partial<FileInjection>[];
       js: Partial<FileInjection & { eval: string }>[];
-      asset_load_wait_ms: number;
+      assetLoadWaitMs: number;
     };
     viewport: {
       width: number;
       height: number;
     };
-    page_timeout: number;
+    pageTimeout: number;
   };
   output: {
     dir: string;
     type: "single" | "separate";
-    filename: string;
-    filenameEval: string;
+    filename?: string;
+    filenameEval?: string;
   };
   concurrency: number;
 }
@@ -49,7 +36,7 @@ export interface AppConfig {
 const relAbsPathRegex = /^(\/[^\/\0]*(\/[^\/\0]*)*|(\.\/|\.\.\/|[^\/].*))$/;
 const configSchema = Joi.object({
   site: Joi.object({
-    base_url: Joi.string()
+    baseUrl: Joi.string()
       .uri({
         allowRelative: false,
         scheme: ["http", "https"],
@@ -75,9 +62,9 @@ const configSchema = Joi.object({
       width: Joi.number().default(1260),
       height: Joi.number().default(968),
     }).default(),
-    page_timeout: Joi.number().default(30 * 1000),
+    pageTimeout: Joi.number().default(30 * 1000),
     inject: Joi.object({
-      asset_load_wait_ms: Joi.number().default(1 * 100),
+      assetLoadWaitMs: Joi.number().default(1 * 100),
       css: Joi.array()
         .items(
           Joi.object({
@@ -120,13 +107,13 @@ const configSchema = Joi.object({
   concurrency: Joi.number().default(1),
 }).required();
 
-export const parseConfig = async (): Promise<AppConfig> => {
-  if (!fs.existsSync(env.CONFIG_FILE)) {
-    throw new Error(`config file missing: ${env.CONFIG_FILE}`);
+export const parseConfig = async (configFile: string): Promise<AppConfig> => {
+  if (!fs.existsSync(configFile)) {
+    throw new Error(`config file missing: ${configFile}`);
   }
-  const configFilePathWithEnvSubst = `${env.CONFIG_FILE}.tmp`;
+  const configFilePathWithEnvSubst = `${configFile}.tmp`;
   await envsub({
-    templateFile: env.CONFIG_FILE,
+    templateFile: configFile,
     outputFile: configFilePathWithEnvSubst,
     options: { protect: false },
   });
@@ -140,6 +127,5 @@ export const parseConfig = async (): Promise<AppConfig> => {
     const errorMsg = error.details.map((it) => it.message).join("\n");
     throw new Error(errorMsg);
   }
-  // console.log(JSON.stringify(value));
   return value;
 };

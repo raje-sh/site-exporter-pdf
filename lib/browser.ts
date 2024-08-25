@@ -7,11 +7,12 @@ import puppeteer, {
 } from "puppeteer";
 import { setTimeout } from "node:timers/promises";
 import fs from "fs";
-import { AppConfig, env } from "./config";
+import { AppConfig } from "./config";
+import { env } from "./env";
 import pLimit from "p-limit";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
-  const cookieDomain = config.site.base_url.split("://")[1].replace(/\/$/, "");
+  const cookieDomain = config.site.baseUrl.split("://")[1].replace(/\/$/, "");
   config.site.cookies.forEach((it) => {
     page.setCookie({
       name: it.key,
@@ -81,7 +82,6 @@ const withBrowser = async <Type>(fn: (browser: Browser) => Promise<Type>, config
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--no-zygote",
-      // "--single-process",
     ],
   });
   try {
@@ -95,7 +95,7 @@ const withPage =
   <Type>(browser: Browser, config: AppConfig) => async (fn: (page: Page) => Promise<Type>) => {
     const page = await browser.newPage();
     setPageCookies(page, config);
-    page.setDefaultTimeout(config.browser.page_timeout);
+    page.setDefaultTimeout(config.browser.pageTimeout);
     await page.setViewport({
       width: config.browser.viewport.width,
       height: config.browser.viewport.height,
@@ -111,7 +111,7 @@ const getFileNameEvalScript = (config: AppConfig): string => {
   if (config.output.type === 'single') {
     return "encodeURIComponent(document.URL).replace(/%/g, '_')";
   }
-  return config.output.filenameEval;
+  return config.output.filenameEval!!;
 }
 
 const processLink = async (
@@ -138,7 +138,7 @@ const processLink = async (
       const pageTitle = await page.evaluate((script) =>
         eval(script), fileNameParserScript
       );
-      await setTimeout(config.browser.inject.asset_load_wait_ms);
+      await setTimeout(config.browser.inject.assetLoadWaitMs);
       const fileName = `${pageTitle}.pdf`;
       await page.pdf({
         path: path.join(config.output.dir, fileName),

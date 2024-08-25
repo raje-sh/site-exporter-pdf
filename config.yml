@@ -1,5 +1,5 @@
 site:
-  base_url: https://www.youtube.com
+  baseUrl: https://www.youtube.com
   links:
     - /watch?v=ozOsx4rfFWs
     - /watch?v=05hdf64yVQU
@@ -9,7 +9,7 @@ site:
 browser:
   headless: ${CHROMIUM_HEADLESS_MODE:-true}
   # inject:
-  #   asset_load_wait_ms: 1000
+  #   assetLoadWaitMs: 1000
   #   css:
   #     - content: |
   #         nav.v-navigation-drawer,header.v-sheet,footer.v-footer{display: none;}
@@ -22,7 +22,7 @@ browser:
   # viewport:
   #   width: 1200
   #   height: 720
-  # page_timeout: 20000
+  # pageTimeout: 20000
 # concurrency: 5
 output:
   dir: ./out

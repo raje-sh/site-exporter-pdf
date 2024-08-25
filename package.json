@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development node --import=tsx index.ts",
     "start": "NODE_ENV=production node --import=tsx index.ts",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "Rajesh Sundaram",
@@ -25,11 +26,21 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@types/download": "^8.0.5",
     "@types/eslint__js": "^8.42.3",
+    "@types/jest": "^29.5.12",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash.clonedeep": "^4.5.9",
+    "@types/lodash.setwith": "^4.3.9",
     "@types/shelljs": "^0.8.15",
+    "download": "^8.0.0",
     "eslint": "^9.9.1",
     "i": "^0.3.7",
+    "jest": "^29.7.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.setwith": "^4.3.2",
     "npm": "^10.8.2",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.2.0"
   }
