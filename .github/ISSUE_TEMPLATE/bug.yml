@@ -1,0 +1,68 @@
+name: Bug report
+description: File a bug report for site-exporter
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        ### Thanks for taking the time to fill out this bug report!
+  - id: mvce
+    type: textarea
+    attributes:
+      label: Minimal, reproducible example
+      description: >
+        Provide a [minimal, reproducible
+        example](https://stackoverflow.com/help/minimal-reproducible-example) of
+        the bug you are facing.
+      render: shell
+      placeholder: |
+        npm run start
+    validations:
+      required: true
+  - id: background
+    type: textarea
+    attributes:
+      label: Background
+      description: >
+        Optional. Briefly describe your use-case that led to this issue. This can help us
+        understand the general situation to provide better, higher quality
+        feedback and help others in similar situations.
+      placeholder: |
+        I've been trying to ...
+  - id: expectation
+    type: textarea
+    attributes:
+      label: Expectation
+      description: What are you expecting the code to do?
+      placeholder: |
+        I expected ...
+    validations:
+      required: true
+  - id: reality
+    type: textarea
+    attributes:
+      label: Reality
+      description: What actually happens?
+      placeholder: |
+        In reality, ...
+    validations:
+      required: true
+  - id: site-exporter-configuration
+    type: textarea
+    attributes:
+      label: site-exporter configuration file
+      description: >
+        Copy and paste your config.yml
+
+        *No need for backticks — this automatically gets formatted into code.*
+      render: yaml
+  - id: site-exporter-version
+    type: input
+    attributes:
+      label: site-exporter version
+      description: >
+        What version of site-exporter are you running? *This must be a valid semver
+        tag, for example, `20.8.1`.*
+    validations:
+      required: true

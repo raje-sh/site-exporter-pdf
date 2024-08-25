@@ -31,7 +31,8 @@
         "Gruntfuggly.todo-tree",
         "vivaxy.vscode-conventional-commits",
         "ChakrounAnas.turbo-console-log",
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "github.vscode-github-actions"
       ]
     }
   }

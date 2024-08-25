@@ -1,23 +1,26 @@
 name: Publish
+permissions: read-all
+# todo: depend on ci workflow
 
 on:
   push:
     tags:
-      - '*'
+      - '*v*'
 # on:
 #   release:
 #     types: [published]
 
 env:
   IMAGE_NAME: site-pdf-exporter
+  REGISTRY: ghcr.io
 
 jobs:
   publish:
     name: Push Container Image
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
+      packages: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -32,6 +35,6 @@ jobs:
       - name: 'GHCR: Build and push'
         id: push-ghcr
         run: |
-          IMAGE_ID="ghcr.io/${{github.actor}}/${{ env.IMAGE_NAME}}:latest"
+          IMAGE_ID="${{ env.REGISTRY }}/${{github.actor}}/${{ env.IMAGE_NAME}}:latest"
           docker build . --tag $IMAGE_ID
           docker push $IMAGE_ID

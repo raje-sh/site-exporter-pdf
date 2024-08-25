@@ -10,6 +10,20 @@
 - prep demo video with non-wiki site https://stackoverflow.com/a/4279746/1092815
   - attach wiki-repo as example to main repo sub-module.
 - add test scripts
+- add debug mode logs
+- investigate why not working in codespaces
+- update github actions to update package version based on tags
+- optimize docker image size (current: last 7 layers are downloaded every new version pull)
+- change repo-name in issue-templates
+- semver versioning
+
+## Running the image
+
+```bash
+docker run -it --rm --cap-add=SYS_ADMIN -v ./config.yml:/usr/src/app/config.yml -v ./out:/usr/src/app/out ghcr.io/raje-sh/site-pdf-exporter:latest
+```
+- `--cap-add=SYS_ADMIN` capability is needed to enable Chrome sandbox that makes the browser more secure. 
+- `--network="host"` is needed when the target site is running on the same host as the Docker container.
 
 # Reference Links
 

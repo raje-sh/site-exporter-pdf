@@ -1,8 +1,10 @@
 node_modules
-example
-.gitignore
-Dockerfile
+.*ignore
 *.md
 .env*
 ./out
+.git*
+.devcontainer
+.vscode
+Dockerfile
 config.yml
