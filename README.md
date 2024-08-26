@@ -29,7 +29,7 @@ Create the necessary directories and configuration file on your host machine:
 Execute the following command to start the application:
 
 ```bash
-docker run -it --rm -v ./config.yml:/app/config.yml -v ./out:/app/out ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
+docker run -it --rm -v ./config.yml:/app/config.yml -v ./out:/app/out ghcr.io/raje-sh/site-exporter-pdf:latest
 ```
 
 - `-v <path_to_config_file>:/app/config.yml`: Maps your local configuration file to the container.
@@ -86,7 +86,7 @@ docker run -it --rm --cap-add=SYS_ADMIN \
   --env-file .env \
   -v ./config.yml:/app/config.yml \
   -v ./out:/app/out \
-  ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
+  ghcr.io/raje-sh/site-pdf-exporter:latest
 
 ```
 
@@ -127,7 +127,7 @@ docker run -it --rm --cap-add=SYS_ADMIN \
   -v ./config.yml:/app/config.yml \
   -v ./out:/app/out \
   -v ./local-asset-path:/app/inject \
-  ghcr.io/rajesh-sundaram-hcl/site-pdf-exporter:latest
+  ghcr.io/raje-sh/site-pdf-exporter:latest
 ```
 
 In this example, the `./local-asset-path` directory on your host machine is mapped to `/app/inject` inside the container, allowing the application to access assets for styling and injecting javascript to the web page.
@@ -150,7 +150,7 @@ If you encounter any issues:
 - Ensure Docker is running and up to date.
 - Verify that the correct directories and files are mapped as volumes in the Docker command.
 - Check the `config.yml` file for any syntax errors.
-  If the problem persists or you encounter a bug, please [open an issue](https://github.com/rajesh-sundaram-hcl/site-exporter/issues) on the GitHub repository. Your feedback helps improve the application!
+  If the problem persists or you encounter a bug, please [open an issue](https://github.com/raje-sh/site-exporter-pdf/issues) on the GitHub repository. Your feedback helps improve the application!
 
 ## Contributing
 
@@ -162,8 +162,7 @@ This project is licensed under the `MIT License`. See the [LICENSE](./LICENSE) f
 
 ## TODO
 
-- investigate why not working in codespaces
-- alter commiter account
+- fix image pulling issue "no matching manifest for linux/arm64/v8 in the manifest list entries"
 - prep demo video with non-wiki site https://stackoverflow.com/a/4279746/1092815
   - attach wiki-repo as example to main repo sub-module.
 - pin the oss repos in github
