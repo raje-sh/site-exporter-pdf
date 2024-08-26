@@ -120,12 +120,6 @@ browser:
 # ...
 ```
 
-#### Warning
-
-When injecting JavaScript as a content string in the `config.yml` file, be aware that JavaScript expressions such as `${}` may be replaced with an empty string. This issue can lead to unexpected behavior if your JavaScript code relies on these expressions.
-
-To avoid problems, consider using other injection methods such as files or URLs, or ensure that your content string does not include `${}` expressions.
-
 #### Example Docker run command with volume mapping:
 
 ```bash
@@ -168,10 +162,8 @@ This project is licensed under the `MIT License`. See the [LICENSE](./LICENSE) f
 
 ## TODO
 
-- update github actions to update package version based on tags
 - investigate why not working in codespaces
 - alter commiter account
-- semver versioning
 - prep demo video with non-wiki site https://stackoverflow.com/a/4279746/1092815
   - attach wiki-repo as example to main repo sub-module.
 - pin the oss repos in github
@@ -179,4 +171,5 @@ This project is licensed under the `MIT License`. See the [LICENSE](./LICENSE) f
 - change repo-name in issue-templates
 - allow setting a domain in cookie to allow muliti-site scraping
 - remove base_url and allow base_url in links
-- release-please config
+- semver versioning, release-please config & auto-release, tag & update-package.json files.
+- update github actions to update package version based on tags

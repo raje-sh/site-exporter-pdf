@@ -9,11 +9,6 @@ on:
       - opened
       - reopened
       - synchronize
-      # Used for `full-ci`
-      - labeled
-  # branches:
-  #   - '**'
-
 jobs:
   build:
     runs-on: ubuntu-latest

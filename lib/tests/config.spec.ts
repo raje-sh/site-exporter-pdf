@@ -165,10 +165,11 @@ describe('config', () => {
         const result = await parseConfig(configFilePath);
         expect(result.site.baseUrl).toEqual("https://whoami.com");
     })
-    // TODO
-    test.skip('should not replace env var if not defined and default value not provided', async () => {
-        writeConfigFile(config2, { 'output.dir': '${MY_BASEURL_NOT_DEFINED}' });
+    test('should not replace env var if not defined and default value not provided', async () => {
+        const jsContent = 'console.log(`${hello}: ${document.title}`);';
+        writeConfigFile(config2, { 'output.dir': '${MY_BASEURL_NOT_DEFINED}', 'browser.inject.js': [{ content: jsContent }] });
         const result = await parseConfig(configFilePath);
         expect(result.output.dir).toEqual("${MY_BASEURL_NOT_DEFINED}");
+        expect(result.browser.inject.js[0].content).toEqual(jsContent);
     })
 });

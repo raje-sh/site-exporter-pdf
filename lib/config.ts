@@ -133,7 +133,8 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
   await envsub({
     templateFile: configFile,
     outputFile: configFilePathWithEnvSubst,
-    options: { protect: false },
+    // Note: changing options may have undesirable effects. refer: https://www.npmjs.com/package/envsub#with---env-or---env-file-and---all
+    options: { all: true, envs: [] },
   });
   debug('substituted env-vars in config file to %s', configFilePathWithEnvSubst);
   const doc = yaml.load(fs.readFileSync(configFilePathWithEnvSubst, "utf-8"));
