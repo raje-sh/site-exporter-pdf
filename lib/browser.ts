@@ -83,9 +83,9 @@ const withBrowser = async <Type>(fn: (browser: Browser) => Promise<Type>, config
       : {}),
     ignoreDefaultArgs: ["--disable-extensions"],
     args: [
-      // "--no-sandbox",
+      "--no-sandbox",
       "--disable-setuid-sandbox",
-      // "--no-zygote",
+      "--no-zygote",
     ],
   });
   try {

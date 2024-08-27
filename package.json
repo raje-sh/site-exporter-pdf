@@ -34,6 +34,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/lodash.setwith": "^4.3.9",
+    "@types/node": "^22.5.0",
     "@types/shelljs": "^0.8.15",
     "download": "^8.0.0",
     "eslint": "^9.9.1",
