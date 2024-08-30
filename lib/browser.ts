@@ -22,6 +22,11 @@ const setPageCookies = (page: Page, config: AppConfig) => {
   });
 };
 
+const setPageHeaders = async (page: Page, config: AppConfig) => {
+  const pageHeaders = config.site.headers.reduce((prev, current) => ({...prev, [current.key]: current.value }), {});
+  await page.setExtraHTTPHeaders(pageHeaders);
+};
+
 const injectAssets = async (
   page: Page,
   type: "script" | "style",
@@ -100,6 +105,7 @@ const withPage =
   <Type>(browser: Browser, config: AppConfig) => async (fn: (page: Page) => Promise<Type>) => {
     const page = await browser.newPage();
     setPageCookies(page, config);
+    await setPageHeaders(page, config);
     page.setDefaultTimeout(config.browser.pageTimeout);
     await page.setViewport({
       width: config.browser.viewport.width,

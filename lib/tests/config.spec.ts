@@ -17,7 +17,8 @@ describe('config', () => {
             links: [
                 '/hello'
             ],
-            cookies: []
+            cookies: [],
+            headers: []
         },
     }
     const config2: Readonly<Partial<AppConfig>> = {
@@ -101,7 +102,9 @@ describe('config', () => {
         const config = await parseConfig(configFilePath);
         expect(config.site.baseUrl).toEqual(config1.site?.baseUrl);
         expect(config.site.links).toEqual(config1.site?.links);
-        expect(config.site.cookies).toEqual(config2.site?.cookies);
+        expect(config.site.cookies[0].key).toEqual(config2.site?.cookies[0].key);
+        expect(config.site.cookies[0].value).toEqual(config2.site?.cookies[0].value);
+        expect(config.site.cookies[0].domain).toEqual(config2.site?.baseUrl.replace(/^http?:\/\//, ''));
         expect(config.browser.headless).toEqual(config2.browser?.headless);
         expect(config.browser.inject).toEqual(config2.browser?.inject);
         expect(config.browser.viewport).toEqual(config2.browser?.viewport);
@@ -182,5 +185,10 @@ describe('config', () => {
         writeConfigFile(config2, { 'site.baseUrl': 'http://example.com', 'site.cookies': [{ key: 'key', value: 'value', domain: 'example.net' }] });
         const result = await parseConfig(configFilePath);
         expect(result.site.cookies[0].domain).toEqual('example.net');
+    })
+    test('should convert header keys to lowercase', async () => {
+        writeConfigFile(config2, { 'site.headers': [{ key: 'Accept', value: 'application/json' }] });
+        const result = await parseConfig(configFilePath);
+        expect(result.site.headers[0].key).toEqual('accept');
     })
 });

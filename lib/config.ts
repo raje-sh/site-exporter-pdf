@@ -22,6 +22,7 @@ export interface AppConfig {
     baseUrl: string;
     links: string[];
     cookies: { key: string; value: string, domain?: string }[];
+    headers: { key: string; value: string}[];
   };
   browser: {
     headless: boolean;
@@ -56,19 +57,27 @@ const configSchema = Joi.object({
       })
       .example("http://localhost:3000")
       .required(),
-    cookies: Joi.array()
-      .items(
-        Joi.object({
-          key: Joi.string().required(),
-          value: Joi.string().required(),
-          domain: Joi.string().optional(),
-        })
-      )
-      .default([]),
-    links: Joi.array()
+      links: Joi.array()
       .items(Joi.string().uri({ relativeOnly: true }))
       .min(1)
       .required(),
+      cookies: Joi.array()
+        .items(
+          Joi.object({
+            key: Joi.string().required(),
+            value: Joi.string().required(),
+            domain: Joi.string().optional(),
+          })
+        )
+        .default([]),
+      headers: Joi.array()
+        .items(
+          Joi.object({
+            key: Joi.string().required(),
+            value: Joi.string().required(),
+          })
+        )
+        .default([]),
   }).required(),
   browser: Joi.object({
     headless: Joi.bool().default(true),
@@ -151,6 +160,7 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
   }
   value.output.pdfOptions = parsePDFOptions(value.output.pdfOptionsAsJSON);
   value.site.cookies = parseCookies(value.site.cookies, value.site.baseUrl);
+  value.site.headers = value.site.headers.map((it : AppConfig['site']['headers'][0]) => ({ key: it.key.toLowerCase(), value: it.value }));
   debug('config validation done: %o', value);
   return value;
 };
@@ -158,7 +168,7 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
 const parseCookies = (cookies: { key: string; value: string, domain?: string }[], baseUrl: string) => {
   const defaultDomain = baseUrl.split("://")[1].replace(/\/$/, "");
   return cookies.map((it) => ({
-    name: it.key,
+    key: it.key,
     value: it.value,
     domain: it.domain || defaultDomain,
   }));
