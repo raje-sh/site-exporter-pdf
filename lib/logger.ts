@@ -1,11 +1,14 @@
 import createDebugger from 'debug';
 
-const debug = createDebugger('site-exporter:common');
-[debug].forEach(it => {
-    it.log = console.log.bind(console);
-})
+const createLogger = (name: string) => {
+    const logger = createDebugger(`site-exporter:${name}`);
+    logger.log = console.log.bind(console);
+    return logger;
+}
 const error = createDebugger('site-exporter:errors');
+const debug = createLogger('common');
 export {
     debug,
-    error
+    error,
+    createLogger
 }

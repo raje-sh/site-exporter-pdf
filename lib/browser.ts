@@ -10,15 +10,14 @@ import fs from "fs";
 import { AppConfig } from "./config";
 import { env } from "./env";
 import pLimit from "p-limit";
-import { error, debug } from "./logger";
+import { error, debug, createLogger } from "./logger";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
-  const cookieDomain = config.site.baseUrl.split("://")[1].replace(/\/$/, "");
   config.site.cookies.forEach((it) => {
     page.setCookie({
       name: it.key,
       value: it.value,
-      domain: cookieDomain,
+      domain: it.domain,
     });
   });
 };
@@ -28,7 +27,8 @@ const injectAssets = async (
   type: "script" | "style",
   files:
     | AppConfig["browser"]["inject"]["js"]
-    | AppConfig["browser"]["inject"]["css"]
+    | AppConfig["browser"]["inject"]["css"],
+  logger: ReturnType<typeof createLogger>
 ) => {
   const getTagOptions = (
     asset:
@@ -52,18 +52,18 @@ const injectAssets = async (
         // eslint-disable-next-line
         const evalScript = (asset as AppConfig["browser"]["inject"]["js"][0])
           .eval;
-        if (evalScript) {
+          if (evalScript) {
+          logger('injecting eval script: %s', evalScript);
           await page.evaluate((script: string) => {
             eval(script);
           }, evalScript);
-          debug('injecting eval script: %s', evalScript);
         } else {
+          logger('injecting script: %s', asset);
           await page.addScriptTag(getTagOptions(asset, {}));
-          debug('injecting script: %s', asset);
         }
         break;
       case "style":
-        debug('injecting style: %s', asset);
+        logger('injecting style: %s', asset);
         await page.addStyleTag(getTagOptions(asset, {}));
         break;
       default:
@@ -79,6 +79,7 @@ const withBrowser = async <Type>(fn: (browser: Browser) => Promise<Type>, config
       ? process.env.PUPPETEER_EXECUTABLE_PATH
       : puppeteer.executablePath(),
     ...(env.isDev
+      // TODO: check the protocolTimeout is needed or not
       ? { devtools: true, protocolTimeout: 60 * 60 * 1000, slowMo: 100 }
       : {}),
     ignoreDefaultArgs: ["--disable-extensions"],
@@ -128,21 +129,21 @@ const processLink = async (
     browser,
     config
   )(async (page: Page) => {
+    const logger = createLogger(link);
     try {
-      debug("processing: %s", link);
       await page.goto(link, {
         waitUntil: "networkidle2",
       });
       if (config.browser.inject.js.length) {
-        await injectAssets(page, "script", config.browser.inject.js);
+        await injectAssets(page, "script", config.browser.inject.js, logger);
       }
       if (config.browser.inject.css?.length) {
-        await injectAssets(page, "style", config.browser.inject.css);
+        await injectAssets(page, "style", config.browser.inject.css, logger);
       }
       const pageTitle = await page.evaluate((script) =>
         eval(script), fileNameParserScript
       );
-      debug('evaluated page title: "%s" and wait for asset to load: %d ms', pageTitle, config.browser.inject.assetLoadWaitMs);
+      logger('wait for asset to load: %d ms', config.browser.inject.assetLoadWaitMs);
       await setTimeout(config.browser.inject.assetLoadWaitMs);
       const fileName = `${pageTitle}.pdf`;
       await page.pdf({

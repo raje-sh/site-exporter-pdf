@@ -172,4 +172,15 @@ describe('config', () => {
         expect(result.output.dir).toEqual("${MY_BASEURL_NOT_DEFINED}");
         expect(result.browser.inject.js[0].content).toEqual(jsContent);
     })
+    test('should parse cookie domain from baseUrl if not set', async () => {
+        writeConfigFile(config2, { 'site.baseUrl': 'http://example.com', 'site.cookies': [{ key: 'key', value: 'value' }] });
+        const result = await parseConfig(configFilePath);
+        expect(result.site.cookies[0].domain).toBeDefined();
+        expect(result.site.cookies[0].domain).toEqual('example.com');
+    })
+    test('should not override cookie domain if it is set', async () => {
+        writeConfigFile(config2, { 'site.baseUrl': 'http://example.com', 'site.cookies': [{ key: 'key', value: 'value', domain: 'example.net' }] });
+        const result = await parseConfig(configFilePath);
+        expect(result.site.cookies[0].domain).toEqual('example.net');
+    })
 });

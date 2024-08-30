@@ -21,7 +21,7 @@ export interface AppConfig {
   site: {
     baseUrl: string;
     links: string[];
-    cookies: { key: string; value: string }[];
+    cookies: { key: string; value: string, domain?: string }[];
   };
   browser: {
     headless: boolean;
@@ -45,7 +45,6 @@ export interface AppConfig {
   };
   concurrency: number;
 }
-
 // eslint-disable-next-line 
 const relAbsPathRegex = /^(\/[^\/\0]*(\/[^\/\0]*)*|(\.\/|\.\.\/|[^\/].*))$/;
 const configSchema = Joi.object({
@@ -62,6 +61,7 @@ const configSchema = Joi.object({
         Joi.object({
           key: Joi.string().required(),
           value: Joi.string().required(),
+          domain: Joi.string().optional(),
         })
       )
       .default([]),
@@ -150,9 +150,19 @@ export const parseConfig = async (configFile: string): Promise<AppConfig> => {
     throw new Error(errorMsg);
   }
   value.output.pdfOptions = parsePDFOptions(value.output.pdfOptionsAsJSON);
+  value.site.cookies = parseCookies(value.site.cookies, value.site.baseUrl);
   debug('config validation done: %o', value);
   return value;
 };
+
+const parseCookies = (cookies: { key: string; value: string, domain?: string }[], baseUrl: string) => {
+  const defaultDomain = baseUrl.split("://")[1].replace(/\/$/, "");
+  return cookies.map((it) => ({
+    name: it.key,
+    value: it.value,
+    domain: it.domain || defaultDomain,
+  }));
+}
 
 const parsePDFOptions = (json: string) => {
   const pdfOptions = JSON.parse(json!!.trim())
