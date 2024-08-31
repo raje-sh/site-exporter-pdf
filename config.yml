@@ -2,6 +2,7 @@ site:
   baseUrl: https://stackoverflow.com
   links:
     - /questions/70487251/webscraping-timeouterror-navigation-timeout-of-30000-ms-exceeded
+    - /questions/7438623/how-to-embed-google-analytics-charts-on-my-website?rq=3
   # cookies:
   #   - key: jwt
   #     value: value
