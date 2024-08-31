@@ -11,6 +11,7 @@ import { AppConfig } from "./config";
 import { env } from "./env";
 import pLimit from "p-limit";
 import { error, debug, createLogger } from "./logger";
+import { nanoid } from "nanoid";
 
 const setPageCookies = (page: Page, config: AppConfig) => {
   config.site.cookies.forEach((it) => {
@@ -124,14 +125,17 @@ const getFileNameEvalScript = (config: AppConfig): string => {
   }
   return config.output.filenameEval!!;
 }
-
+export interface ProcessLinkResult {
+  fileName: string;
+  tmpId: string;
+}
 const processLink = async (
   link: string,
   config: AppConfig,
   browser: Browser,
   fileNameParserScript: string
 ) => {
-  return await withPage<string | undefined>(
+  return await withPage<ProcessLinkResult | undefined>(
     browser,
     config
   )(async (page: Page) => {
@@ -151,13 +155,13 @@ const processLink = async (
       );
       logger('wait for asset to load: %d ms', config.browser.inject.assetLoadWaitMs);
       await setTimeout(config.browser.inject.assetLoadWaitMs);
-      const fileName = `${pageTitle}.pdf`;
+      const tmpId = nanoid();
       await page.pdf({
-        path: path.join(config.output.dir, fileName),
+        path: path.join(config.output.dir, tmpId),
         timeout: config.browser.pageTimeout,
         ...config.output.pdfOptions
       });
-      return fileName;
+      return {fileName: pageTitle, tmpId};
     } catch (e) {
       error('failed processing: %s, error: %o', link, e);
     }
@@ -169,18 +173,18 @@ export const launchBrowserAndTakeSnapshot = async (
   config: AppConfig
 ) => {
   const parallelize = pLimit(config.concurrency);
-  const pdfFileChunks: Record<string, string> = {};
+  const pdfFileChunks: Record<string, ProcessLinkResult> = {};
   const fileNameParserScript = getFileNameEvalScript(config);
   return (await withBrowser(async (browser: Browser) => {
     const pushLink = async (link: string) => {
-      const fileName = await processLink(link, config, browser, fileNameParserScript);
-      if (fileName) {
-        pdfFileChunks[link] = fileName;
-        debug('processed: %s, output: %s', link, fileName);
+      const result = await processLink(link, config, browser, fileNameParserScript);
+      if (result) {
+        pdfFileChunks[link] = result;
+        debug('processed: %s', link);
       }
     };
     await Promise.all(links.map((it) => parallelize(() => pushLink(it))));
-    debug('finsished processing all "%d" links', links.length);
+    debug('finished processing all "%d" links', links.length);
     return pdfFileChunks;
-  }, config)) as Record<string, string>;
+  }, config));
 };
