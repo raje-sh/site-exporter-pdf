@@ -31,3 +31,8 @@ output:
   # type: separate
   # filenameEval: document.title.substr(0, 10)
   pdfOptionsAsJSON: '{"margin": {"top": 100, "right": 100, "bottom": 100, "left": 100}, "headerTemplate": "<h1>who AM I</h1>"}'
+
+hooks:
+  nodeDependencies: []
+  hooksDirectory: /Users/rajesh.sundaram/dev/personal/site-exporter-pdf
+  indexFile: site-exporter.ts

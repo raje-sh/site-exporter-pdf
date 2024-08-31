@@ -4,3 +4,4 @@ out
 example/out
 **/.DS_Store
 config.yml.tmp
+lib/custom_hooks

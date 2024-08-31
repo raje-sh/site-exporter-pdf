@@ -4,6 +4,7 @@ import Joi from "joi";
 import envsub from "envsub";
 import { PDFOptions } from "puppeteer";
 import { debug, error } from "./logger";
+import path from "path";
 
 const defaultPDFOptions: Omit<PDFOptions, 'path'> = {
   format: "A4",
@@ -45,6 +46,11 @@ export interface AppConfig {
     pdfOptions?: Omit<PDFOptions, 'path'>;
   };
   concurrency: number;
+  hooks?: {
+    nodeDependencies: string[],
+    hooksDirectory: string,
+    indexFile: string,
+  };
 }
 // eslint-disable-next-line 
 const relAbsPathRegex = /^(\/[^\/\0]*(\/[^\/\0]*)*|(\.\/|\.\.\/|[^\/].*))$/;
@@ -130,6 +136,18 @@ const configSchema = Joi.object({
     // pdfOptionsAsJSON: Joi.string().default(JSON.stringify(defaultPDFOptions)),
   }).default(),
   concurrency: Joi.number().default(3),
+  hooks: Joi.object({
+    nodeDependencies: Joi.array().items(Joi.string()).default([]),
+    hooksDirectory: Joi.string().custom((value, helpers) => {
+      if (!path.isAbsolute(value)) {
+          return helpers.error('string.absolutePath');
+      }
+      return value;
+  }, 'Absolute Path Validation').messages({
+      'string.absolutePath': '"{{#label}}" must be an absolute path',
+  }).required(),
+    indexFile: Joi.string().default('site-exporter.ts'),
+  }).optional(),
 }).required();
 
 export const parseConfig = async (configFile: string): Promise<AppConfig> => {

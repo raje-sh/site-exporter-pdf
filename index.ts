@@ -12,6 +12,7 @@ import {
 import { URL } from 'url'
 import { error } from "console";
 import { withTiming } from "./lib/util";
+import { loadHooks } from "./lib/hooks";
 
 
 const getFullURI = (base_url: string, path: string) => (new URL(path, base_url)).toString();
@@ -30,6 +31,16 @@ const createDirectoryIfNotExists = (directory: string) => {
     debug('Starting site-exporter')
     if (env.isDev) { console.time("export"); }
     const config = await parseConfig(env.CONFIG_FILE);
+
+    const hooks = await loadHooks(config.hooks)
+    console.log("🚀 ~ awaitwithTiming ~ hooks:", hooks)
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    hooks.onConfigParsingComplete && hooks.onConfigParsingComplete({
+      site: {
+        baseUrl: 'https://example.com'
+      }
+    });
+    
     createDirectoryIfNotExists(config.output.dir);
     const links = config.site.links.map((it) => getFullURI(config.site.baseUrl, it));
     const result = await launchBrowserAndTakeSnapshot(links, config);
