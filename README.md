@@ -140,12 +140,7 @@ In this example, the `./local-asset-path` directory on your host machine is mapp
 
 Here are some example repositories demonstrating the use of this application to convert various types of sites to PDF:
 
-<!-- TODO -->
-
-- `Wiki.js PDF Exporter`: An example setup for converting Wiki.js pages to PDF documents.
-- `YouTube Playlist Exporter`: Demonstrates how to convert YouTube playlist pages into PDFs.
-- `Blog Exporter`: A setup for exporting blog pages to PDF format.
-- `E-commerce Site Exporter`: Shows how to convert product and category pages from an e-commerce site to PDFs.
+- [Wiki.js PDF Exporter](https://github.com/raje-sh/wikijs-pdf-exporter)
 
 ## Troubleshooting
 
