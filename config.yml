@@ -3,31 +3,20 @@ site:
   links:
     - /questions/70487251/webscraping-timeouterror-navigation-timeout-of-30000-ms-exceeded
     - /questions/7438623/how-to-embed-google-analytics-charts-on-my-website?rq=3
-  # cookies:
-  #   - key: jwt
-  #     value: value
 browser:
   headless: ${CHROMIUM_HEADLESS_MODE:-true}
-  # inject:
-  #   assetLoadWaitMs: 1000
-  #   css:
-  #     - content: |
-  #         nav.v-navigation-drawer,header.v-sheet,footer.v-footer{display: none;}
-  #   js:
-  #     - url: https://code.jquery.com/jquery-3.7.1.min.js
-  #     - content: |
-  #         $(document).ready(function(){
-  #           $('body').prepend('<h1 style="color: green">DYNAMIC JS CONTENT</h1>');
-  #         });
-  # viewport:
-  #   width: 1200
-  #   height: 720
-  # pageTimeout: 20000
-# concurrency: 5
+  inject:
+    css:
+      - content: |
+          #left-sidebar,header,footer, #sidebar, #onetrust-consent-sdk {display: none;}
+    js:
+      - url: https://code.jquery.com/jquery-3.7.1.min.js
+      - content: |
+          $(document).ready(function(){
+            $('body').prepend('<h1 style="color: green">Created By SITE-EXPORTER-PDF</h1>');
+          });
 output:
   dir: ./out
   type: single
   filename: output
-  # type: separate
-  # filenameEval: document.title.substr(0, 10)
-  pdfOptionsAsJSON: '{"margin": {"top": 100, "right": 100, "bottom": 100, "left": 100}, "headerTemplate": "<h1>who AM I</h1>"}'
+  pdfOptionsAsJSON: '{"margin": {"top": 100, "right": 100, "bottom": 100, "left": 100}}'
