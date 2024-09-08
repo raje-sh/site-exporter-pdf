@@ -4,8 +4,9 @@
 
 This application converts web page links into PDF documents and is designed for seamless usage via Docker.
 
-<!-- TODO -->
-<!-- <video src="./example/js-exporter-demo.mov" width="1280" height="720" controls onloadstart="this.playbackRate = 1.5;"></video> -->
+
+https://github.com/user-attachments/assets/414a44a3-631e-48f9-8502-cc8cfa71c61d
+
 
 ## Features
 
