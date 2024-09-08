@@ -1,5 +1,7 @@
 # Web Page to PDF Converter
 
+[![CI](https://github.com/raje-sh/site-exporter-pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/raje-sh/site-exporter-pdf/actions/workflows/ci.yml)
+
 This application converts web page links into PDF documents and is designed for seamless usage via Docker.
 
 <!-- TODO -->
